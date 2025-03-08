@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 @import "tailwindcss";
 
-html,body{
+html, body {
   background-color: #020618;
+  font-family: 'Nunito', sans-serif;
 }

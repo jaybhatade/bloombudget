@@ -1,0 +1,77 @@
+{
+  "users": {
+    "userID_123": {
+      "email": "user@example.com",
+      "displayName": "John Doe",
+      "currency": "INR",
+      "createdAt": "timestamp"
+    }
+  },
+
+  "transactions": {
+    "transactionID_456": {
+      "userID": "userID_123",
+      "type": "expense",  // "income" or "expense"
+      "amount": 100,
+      "category": "Food",
+      "date": "timestamp",
+      "paymentMethod": "Credit Card",
+      "notes": "Dinner with friends"
+    }
+  },
+
+  "budgets": {
+    "budgetID_001": {
+      "userID": "userID_123",
+      "category": "Food",
+      "amount": 500,
+      "startDate": "timestamp",
+      "endDate": "timestamp"
+    }
+  },
+
+  "ai_insights": {
+    "insightID_101": {
+      "userID": "userID_123",
+      "analysis": "Based on your spending, you exceeded your budget for Food.",
+      "suggestions": ["Reduce eating out", "Try meal prepping"],
+      "createdAt": "timestamp"
+    }
+  }
+}
+
+
+-----Final _------
+{
+  "subscriptions" (Collection): {
+    "subscriptionID_001" (Document): {
+      "userID": "userID_123",
+      "name": "Netflix",
+      "amount": 15.99,
+      "category": "Entertainment",
+      "paymentMethod": "Credit Card",
+      "billingCycle": "Monthly", 
+      "nextBillingDate": "2025-04-01",
+      "status": "Active",  // Active, Canceled, Expired
+      "createdAt": "timestamp"
+    }
+  },
+
+  "transactions": {
+    "transactionID_456": {
+      "userID": "userID_123",
+      "type": "expense",  // "income" or "expense"
+      "amount": 100,
+      "category": "Food",
+      "date": "timestamp",
+      "paymentMethod": "Credit Card",
+      "notes": "Dinner with friends"
+    }
+  },
+
+categories (Collection)
+  - categoryID (Document)
+    - name: "Entertainment"
+    icon: "😂"
+    - type: "expense"
+    - userID: "default" (for system categories) or "user123" (for custom ones)

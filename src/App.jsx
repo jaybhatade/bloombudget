@@ -26,7 +26,7 @@ function App() {
         <Outlet />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/login" element={<AuthPage />} />
           <Route path="/stats" element={<StatPage />} />
           <Route path="/add" element={<AddPage />} />
           <Route path="/profile" element={<ProfilePage />} />

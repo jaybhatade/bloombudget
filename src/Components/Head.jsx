@@ -6,7 +6,7 @@ function Head() {
             {/* Header */}
             <header className="p-4 border-b border-slate-800">
         <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold">Bloom Budget</h1>
+          <h1 className="text-xl font-bold  font-[poppins]">BLOOM BUDGET</h1>
           <div className="flex items-center space-x-2">
             <button className="p-2 rounded-full bg-slate-800">
               <FiPlus className="text-white" />

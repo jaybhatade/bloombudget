@@ -1,6 +1,6 @@
 import React from 'react'
 import Navbar from '../Components/Navbar'
-import { FiChevronRight, FiStar, FiSettings } from 'react-icons/fi'
+import { FiChevronRight, FiStar, FiSettings, FiDollarSign} from 'react-icons/fi'
 import { motion } from 'framer-motion'
 
 function ProfilePage() {
@@ -57,12 +57,20 @@ function ProfilePage() {
           </motion.button>
 
           {/* Settings */}
-          <motion.button className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-800 transition-colors" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
+          <motion.button className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-800 hover:bg-slate-800 transition-colors" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
             <div className="flex items-center">
               <FiSettings className="text-slate-400 w-6 h-6" />
               <span className="ml-3">Settings</span>
             </div>
             <FiChevronRight className="text-slate-400" />
+          </motion.button>
+
+          <motion.button className="w-full flex items-center justify-between px-6 py-4 bg-slate-800 cursor-not-allowed" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }} disabled>
+            <div className="flex items-center">
+              <FiDollarSign className="text-slate-500 w-6 h-6 opacity-50" />
+              <span className="ml-3 text-slate-500">Multi Currency</span>
+            </div>
+            <FiChevronRight className="text-slate-500 opacity-50" />
           </motion.button>
         </div>
       </motion.div>
