@@ -199,7 +199,7 @@ export default function HomePage() {
           </motion.div>
 
           {/* Recent Transactions */}
-          <motion.div variants={cardVariants} className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-6 mb-10 rounded-xl shadow-lg">
+          <motion.div variants={cardVariants} className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-6 mb-24 rounded-xl shadow-lg">
             <h2 className="text-lg font-semibold mb-4">Recent Transactions</h2>
             <ul className="space-y-4">
               {[
