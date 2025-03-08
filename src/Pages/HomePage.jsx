@@ -104,7 +104,7 @@ export default function HomePage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={incomeVsExpenseData}>
                   <Tooltip
-                    contentStyle={{ backgroundColor: "#1F2937", border: "none" }}
+                    contentStyle={{ backgroundColor: "#1F2937", border: "none" , borderRadius: "10px"}}
                     itemStyle={{ color: "#FFFFFF" }}
                   />
                   <Bar dataKey="income" fill="#60A5FA" radius={[4, 4, 0, 0]} />

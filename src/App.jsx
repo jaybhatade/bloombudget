@@ -6,6 +6,7 @@ import StatPage from './Pages/StatPage';
 import AddPage from './Pages/AddPage';
 import ProfilePage from './Pages/ProfilePage';
 import AiPage from './Pages/AiPage';
+import AuthPage from './Pages/Auth';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -25,6 +26,7 @@ function App() {
         <Outlet />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/stats" element={<StatPage />} />
           <Route path="/add" element={<AddPage />} />
           <Route path="/profile" element={<ProfilePage />} />

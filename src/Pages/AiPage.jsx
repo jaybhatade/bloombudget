@@ -77,7 +77,7 @@ function AiPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 flex flex-col">
+    <div className="min-h-[100dvh] bg-slate-950 text-white p-4 flex flex-col">
       <motion.div 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
