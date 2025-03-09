@@ -4,7 +4,7 @@ import { FiPlus, FiEdit, FiTrash, FiChevronDown, FiAlertCircle, FiCheck } from '
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../Firebase';
 import { Link } from 'react-router-dom';
 
 function Budget() {
