@@ -23,10 +23,9 @@
   "budgets": {
     "budgetID_001": {
       "userID": "userID_123",
-      "category": "Food",
+      "category": "Food", || "Main
       "amount": 500,
-      "startDate": "timestamp",
-      "endDate": "timestamp"
+      "month": "Janaury"
     }
   },
 

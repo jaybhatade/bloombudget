@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiX, FiTag, FiCreditCard, FiPlus, FiMoreHorizontal, FiCalendar } from 'react-icons/fi';
+import { FiX, FiTag, FiCreditCard, FiPlus, FiMoreHorizontal, FiCalendar, FiPieChart } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { collection, addDoc, getDocs, serverTimestamp, query, where } from 'firebase/firestore';
 import { db } from '../Firebase'; // Ensure you have Firebase initialized elsewhere
@@ -19,8 +19,7 @@ function AddPage() {
   const [showMoreCategories, setShowMoreCategories] = useState(false);
   const [categories, setCategories] = useState({
     expense: [],
-    income: [],
-    transfer: []
+    income: []
   });
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
@@ -31,9 +30,8 @@ function AddPage() {
   
   const userID = localStorage.getItem("userID"); // Fetch user ID from local storage
   
-  
   // Define available emoji icons for new categories
-  const emojiOptions = ["🛍️", "🍽️", "📱", "🎮", "📚", "💅", "⚽", "🤝", "🚗", "👕", "🚙", "🍺", "🚬", "💰", "💻", "📈", "🎁", "💵", "🏦", "💳", "↔️", "🏠", "💊", "✈️", "🎭", "🎟️", "📊"];
+  const emojiOptions = ["🛍️", "🍽️", "📱", "🎮", "📚", "💅", "⚽", "🤝", "🚗", "👕", "🚙", "🍺", "🚬", "💰", "💻", "📈", "🎁", "💵", "🏦", "💳", "🏠", "💊", "✈️", "🎭", "🎟️", "📊"];
 
   // Define payment method options
   const paymentMethods = [
@@ -57,8 +55,7 @@ function AddPage() {
           where("userID", "==", "default")
         );
         
-        // Get user's custom categories (assume user authentication is implemented)
-          // This should come from your auth system
+        // Get user's custom categories
         const userCategoriesQuery = query(
           collection(db, "categories"),
           where("userID", "==", userID)
@@ -70,28 +67,10 @@ function AddPage() {
         ]);
         
         const allCategories = {
-          
-            expense: [
-              { id: "shopping", name: "Shopping", icon: "🛍️", type: "expense" },
-              { id: "food", name: "Food", icon: "🍽️", type: "expense" },
-              { id: "phone", name: "Phone", icon: "📱", type: "expense" },
-              { id: "entertainment", name: "Entertainment", icon: "🎮", type: "expense" },
-              { id: "education", name: "Education", icon: "📚", type: "expense" },
-              { id: "beauty", name: "Beauty", icon: "💅", type: "expense" }
-            ],
-            income: [
-              { id: "salary", name: "Salary", icon: "💰", type: "income" },
-              { id: "freelance", name: "Freelance", icon: "💻", type: "income" },
-              { id: "investments", name: "Investments", icon: "📈", type: "income" },
-              { id: "gifts", name: "Gifts", icon: "🎁", type: "income" },
-              { id: "refunds", name: "Refunds", icon: "↩️", type: "income" },
-              { id: "other", name: "Other Income", icon: "💵", type: "income" }
-            ],
-            transfer: [
-              { id: "account_to_cash", name: "Account to Cash", icon: "🏦", type: "transfer" },
-              { id: "cash_to_account", name: "Cash to Account", icon: "💳", type: "transfer" },
-              { id: "account_to_account", name: "Account to Account", icon: "↔️", type: "transfer" }
-            ]
+          expense: [
+          ],
+          income: [
+          ]
         };
         
         // Process system categories first
@@ -118,8 +97,6 @@ function AddPage() {
         setCategories(allCategories);
       } catch (error) {
         console.error("Error fetching categories:", error);
-        // Fallback to default categories if fetch fails
-        
       } finally {
         setLoading(false);
       }
@@ -148,8 +125,6 @@ function AddPage() {
     }
 
     try {
-        // Replace with actual user ID from auth
-      
       const selectedCategoryObj = getCategoriesForType().find(cat => cat.id === selectedCategory);
       
       await addDoc(collection(db, "transactions"), {
@@ -184,8 +159,6 @@ function AddPage() {
     }
 
     try {
-        // Replace with actual user ID from auth
-      
       const docRef = await addDoc(collection(db, "categories"), {
         name: newCategoryName.trim(),
         icon: newCategoryIcon,
@@ -225,8 +198,6 @@ function AddPage() {
     }
 
     try {
-        // Replace with actual user ID from auth
-      
       // Get existing payment methods
       const methodsQuery = query(
         collection(db, "paymentMethods"),
@@ -286,13 +257,14 @@ function AddPage() {
         <div className="w-8"></div>
       </div>
 
+
+
       {/* Transaction Type Selector */}
       <div className="mx-4 my-6">
         <div className="flex rounded-lg overflow-hidden shadow-lg">
           {[
             {type: "expense", color: "bg-red-500"},
-            {type: "income", color: "bg-green-500"},
-            {type: "transfer", color: "bg-blue-500"}
+            {type: "income", color: "bg-green-500"}
           ].map(({type, color}) => (
             <button
               key={type}
@@ -337,9 +309,8 @@ function AddPage() {
           ) : (
             <div className="grid grid-cols-4 gap-4">
               {visibleCategories.map((category) => (
-                <div className='flex flex-col items-center justify-center'>
+                <div key={category.id} className='flex flex-col items-center justify-center'>
                 <button
-                  key={category.id}
                   type="button"
                   onClick={() => setSelectedCategory(category.id)}
                   className={`aspect-square rounded-full flex flex-col h-14 items-center justify-center transition-all ${
@@ -390,12 +361,12 @@ function AddPage() {
           <label className="flex items-center text-sm font-medium mb-2 text-slate-300">
             <FiCalendar className="mr-2" /> Date
           </label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={date => setSelectedDate(date)}
-            className="w-full bg-slate-800 rounded-lg p-4 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
-            dateFormat="MMMM d, yyyy"
-            maxDate={new Date()}
+          <input
+            type="date"
+            value={selectedDate.toISOString().split('T')[0]}
+            onChange={e => setSelectedDate(new Date(e.target.value))}
+            max={new Date().toISOString().split('T')[0]}
+            className="w-full bg-slate-800 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
           />
         </div>
 
@@ -415,9 +386,8 @@ function AddPage() {
           </div>
           <div className="grid grid-cols-4 gap-4">
             {paymentMethods.map((method) => (
-              <div className='flex flex-col justify-center'>
+              <div key={method.id} className='flex flex-col justify-center'>
               <button
-                key={method.id}
                 type="button"
                 onClick={() => setPaymentMethod(method.id)}
                 className={`aspect-square rounded-full flex flex-col h-14 items-center justify-center transition-all ${
@@ -475,28 +445,30 @@ function AddPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-4 border-b border-slate-800 flex justify-between items-center">
-                <h3 className="text-lg font-semibold">All Categories</h3>
+                <h3 className="text-lg font-semibold">All Categories </h3>
                 <button onClick={() => setShowMoreCategories(false)} className="text-slate-400 hover:text-white">
                   <FiX size={24} />
                 </button>
               </div>
               <div className="p-4 grid grid-cols-3 gap-4">
                 {moreCategories.map((category) => (
+                  <div>
                   <button
                     key={category.id}
                     onClick={() => {
                       setSelectedCategory(category.id);
                       setShowMoreCategories(false);
                     }}
-                    className={`aspect-square rounded-full flex flex-col items-center justify-center transition-all ${
+                    className={`aspect-square h-14 rounded-full flex flex-col items-center justify-center transition-all ${
                       selectedCategory === category.id 
                         ? 'bg-blue-500 text-white scale-110' 
                         : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                     }`}
                   >
                     <span className="text-2xl">{category.icon}</span>
-                    <span className="text-xs mt-1 truncate w-full text-center px-2">{category.name}</span>
                   </button>
+                    <span className="text-xs mt-1 truncate w-full text-center px-2">{category.name}</span>
+                  </div>
                 ))}
               </div>
             </motion.div>
