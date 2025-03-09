@@ -1,13 +1,59 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Navbar from '../Components/Navbar'
-import { FiChevronRight, FiStar, FiSettings, FiDollarSign} from 'react-icons/fi'
+import { FiChevronRight, FiStar, FiSettings, FiDollarSign, FiLogOut } from 'react-icons/fi'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 
 function ProfilePage() {
+  const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleCancelLogout = () => {
+    setShowLogoutConfirm(false);
+  };
+
   return (
     <motion.div 
       className="min-h-screen bg-slate-950 text-white"
     >
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <motion.div 
+            className="bg-slate-800 rounded-xl p-6 max-w-sm w-full mx-4"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.2 }}
+          >
+            <h3 className="text-xl font-semibold mb-4">Confirm Logout</h3>
+            <p className="text-slate-300 mb-6">Are you sure you want to logout?</p>
+            <div className="flex justify-end gap-3">
+              <button 
+                className="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+                onClick={handleCancelLogout}
+              >
+                Cancel
+              </button>
+              <button 
+                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {/* User Profile Section */}
       <motion.div 
         className="px-6 pt-8 pb-6 bg-slate-950"
@@ -71,6 +117,20 @@ function ProfilePage() {
               <span className="ml-3 text-slate-500">Multi Currency</span>
             </div>
             <FiChevronRight className="text-slate-500 opacity-50" />
+          </motion.button>
+
+          {/* Logout */}
+          <motion.button 
+            className="w-full flex items-center justify-between px-6 py-4 border-t border-slate-800 hover:bg-red-500/10 transition-colors text-red-500"
+            onClick={handleLogoutClick}
+            initial={{ x: -20, opacity: 0 }} 
+            animate={{ x: 0, opacity: 1 }} 
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex items-center">
+              <FiLogOut className="w-6 h-6" />
+              <span className="ml-3">Logout</span>
+            </div>
           </motion.button>
         </div>
       </motion.div>

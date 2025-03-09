@@ -204,7 +204,7 @@ function AiPage() {
           )}
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col justify-center mt-auto">
-          <div className="relative">
+          <div className="relative flex">
             <textarea 
               value={userInput}
               onChange={handleInputChange}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { getFirestore, collection, getDocs, query, where, addDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, query, where, addDoc, doc, getDoc } from "firebase/firestore";
 import { FiUser, FiMail, FiLock } from "react-icons/fi";
 import { motion } from "framer-motion";
 import app from "../Firebase";
@@ -18,12 +18,25 @@ const AuthPage = () => {
     const db = getFirestore(app);
 
     useEffect(() => {
-        const loggedInUser = localStorage.getItem("user");
-        if (loggedInUser) {
-            const userData = JSON.parse(loggedInUser);
-            navigate(userData.role === "Admin" ? "/admin" : "/", { state: { user: userData } });
-        }
-    }, [navigate]);
+        const checkAuth = async () => {
+            const userID = JSON.parse(localStorage.getItem("user"))?.userId;
+            
+            if (!userID) {
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, 'users', userID));
+                if (userDoc.exists()) {
+                    navigate("/");
+                }
+            } catch (error) {
+                console.error('Error checking authentication:', error);
+            }
+        };
+
+        checkAuth();
+    }, [navigate, db]);
 
     const handleChange = (e) => {
         setFormData({
@@ -53,7 +66,7 @@ const AuthPage = () => {
                         role: user.role,
                     };
                     localStorage.setItem("user", JSON.stringify(userData));
-                    localStorage.setItem("userID", userId);
+                    
                     navigate(user.role === "Admin" ? "/admin" : "/", { state: { user: userData } });
                 } else {
                     setError("Invalid password!");
