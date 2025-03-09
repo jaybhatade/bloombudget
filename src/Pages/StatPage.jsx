@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Components/Navbar';
-import Statstab from '../Subpages/statstab';
+import Statstab from '../Subpages/Statstab';
 import ReportTab from '../Subpages/ReportTab';
 
 function StatPage() {
