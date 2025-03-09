@@ -19,7 +19,7 @@ const AuthPage = () => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const userID = JSON.parse(localStorage.getItem("user"))?.userId;
+            const userID = localStorage.getItem("userID");
             
             if (!userID) {
                 return;
@@ -60,12 +60,9 @@ const AuthPage = () => {
                 
                 if (user.password === formData.password) {
                     const userData = {
-                        userId,
-                        email: user.email,
-                        name: user.name,
-                        role: user.role,
+                        userId
                     };
-                    localStorage.setItem("user", JSON.stringify(userData));
+                    localStorage.setItem("userID", userId);
                     
                     navigate(user.role === "Admin" ? "/admin" : "/", { state: { user: userData } });
                 } else {

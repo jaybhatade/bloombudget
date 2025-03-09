@@ -26,7 +26,7 @@ function ProtectedRoute({ children }) {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const userID = JSON.parse(localStorage.getItem("user"))?.userId;
+      const userID = localStorage.getItem("userID");
       
       if (!userID) {
         setIsAuthenticated(false);

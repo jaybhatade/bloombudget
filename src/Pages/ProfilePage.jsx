@@ -1,15 +1,46 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from '../Components/Navbar'
 import { FiChevronRight, FiStar, FiSettings, FiDollarSign, FiLogOut } from 'react-icons/fi'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../Firebase'
 
 function ProfilePage() {
   const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [userData, setUserData] = useState({ name: "User", email: "user@example.com" });
+  const userID = localStorage.getItem("userID");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (userID) {
+        try {
+          const userDocRef = doc(db, "users", userID);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            setUserData(userDocSnap.data());
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [userID]);
+
+  const getInitials = (name) => {
+    const names = name.split(' ');
+    if (names.length === 1) {
+      return names[0].charAt(0).toUpperCase();
+    }
+    return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("userID");
     navigate("/login");
   };
 
@@ -65,11 +96,11 @@ function ProfilePage() {
           <motion.div 
             className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-2xl font-bold"
           >
-            JB
+            {getInitials(userData.name)}
           </motion.div>
           <motion.div className="ml-4" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
-            <h2 className="text-xl font-semibold">Jay Bhatade</h2>
-            <p className="text-slate-400">test@example.com</p>
+            <h2 className="text-xl font-semibold">{userData.name}</h2>
+            <p className="text-slate-400">{userData.email}</p>
           </motion.div>
         </div>
       </motion.div>

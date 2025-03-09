@@ -41,6 +41,18 @@
 }
 
 
+-----Local Storage-------
+const userData = {
+userId,
+email: user.email,
+name: user.name,
+role: user.role,
+};
+localStorage.setItem("user", JSON.stringify(userData));
+
+
+
+
 -----Final _------
 {
   "subscriptions" (Collection): {
