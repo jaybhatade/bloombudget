@@ -28,9 +28,9 @@ function AddPage() {
   const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
   const [newPaymentMethodName, setNewPaymentMethodName] = useState("");
   const [newPaymentMethodIcon, setNewPaymentMethodIcon] = useState("💳");
-
+  
   const userID = localStorage.getItem("userID"); // Fetch user ID from local storage
-
+  
   
   // Define available emoji icons for new categories
   const emojiOptions = ["🛍️", "🍽️", "📱", "🎮", "📚", "💅", "⚽", "🤝", "🚗", "👕", "🚙", "🍺", "🚬", "💰", "💻", "📈", "🎁", "💵", "🏦", "💳", "↔️", "🏠", "💊", "✈️", "🎭", "🎟️", "📊"];
@@ -58,7 +58,7 @@ function AddPage() {
         );
         
         // Get user's custom categories (assume user authentication is implemented)
-        const userID = "userID"; // This should come from your auth system
+          // This should come from your auth system
         const userCategoriesQuery = query(
           collection(db, "categories"),
           where("userID", "==", userID)
@@ -148,7 +148,7 @@ function AddPage() {
     }
 
     try {
-      const userID = "userID"; // Replace with actual user ID from auth
+        // Replace with actual user ID from auth
       
       const selectedCategoryObj = getCategoriesForType().find(cat => cat.id === selectedCategory);
       
@@ -184,7 +184,7 @@ function AddPage() {
     }
 
     try {
-      const userID = "userID"; // Replace with actual user ID from auth
+        // Replace with actual user ID from auth
       
       const docRef = await addDoc(collection(db, "categories"), {
         name: newCategoryName.trim(),
@@ -225,7 +225,7 @@ function AddPage() {
     }
 
     try {
-      const userID = "userID"; // Replace with actual user ID from auth
+        // Replace with actual user ID from auth
       
       // Get existing payment methods
       const methodsQuery = query(

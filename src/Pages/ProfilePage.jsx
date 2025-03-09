@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Navbar from '../Components/Navbar'
 import { FiChevronRight, FiStar, FiSettings, FiDollarSign, FiLogOut } from 'react-icons/fi'
+import { FaUniversity } from "react-icons/fa";
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { doc, getDoc } from 'firebase/firestore'
@@ -142,10 +143,18 @@ function ProfilePage() {
             <FiChevronRight className="text-slate-400" />
           </motion.button>
 
-          <motion.button className="w-full flex items-center justify-between px-6 py-4 bg-slate-800 cursor-not-allowed" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }} disabled>
+          <motion.button className="w-full flex items-center justify-between px-6 py-4 border-b-2  border-slate-900 bg-slate-800 cursor-not-allowed" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }} disabled>
             <div className="flex items-center">
               <FiDollarSign className="text-slate-500 w-6 h-6 opacity-50" />
-              <span className="ml-3 text-slate-500">Multi Currency</span>
+              <span className="ml-3 text-slate-500">Multi Currency ( coming soon )</span>
+            </div>
+            <FiChevronRight className="text-slate-500 opacity-50" />
+          </motion.button>
+
+          <motion.button className="w-full flex items-center justify-between px-6 py-4 bg-slate-800 cursor-not-allowed" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }} disabled>
+            <div className="flex items-center">
+              <FaUniversity className="text-slate-500 w-6 h-6 opacity-50" />
+              <span className="ml-3 text-slate-500">Link Accounts ( coming soon )</span>
             </div>
             <FiChevronRight className="text-slate-500 opacity-50" />
           </motion.button>

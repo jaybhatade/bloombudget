@@ -9,6 +9,7 @@ import AiPage from './Pages/AiPage';
 import AuthPage from './Pages/Auth';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from './Firebase';
+import AllTransactions from './Subpages/AllTransactions';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -94,6 +95,11 @@ function App() {
           <Route path="/ai" element={
             <ProtectedRoute>
               <AiPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/transactions" element={
+            <ProtectedRoute>
+              <AllTransactions />
             </ProtectedRoute>
           } />
         </Routes>
