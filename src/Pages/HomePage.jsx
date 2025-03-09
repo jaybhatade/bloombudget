@@ -15,22 +15,6 @@ export default function HomePage() {
   
 
   // Sample data
-  const expenseData = [
-    { name: "Housing", value: 1200, color: "#FF6B6B" },
-    { name: "Food", value: 450, color: "#4ECDC4" },
-    { name: "Transport", value: 300, color: "#FFD166" },
-    { name: "Entertainment", value: 200, color: "#6A0572" },
-    { name: "Others", value: 150, color: "#1A535C" },
-  ]
-
-  const incomeVsExpenseData = [
-    { name: "Jan", income: 4500, expenses: 3200 },
-    { name: "Feb", income: 4800, expenses: 3600 },
-    { name: "Mar", income: 5200, expenses: 3800 },
-    { name: "Apr", income: 5000, expenses: 3500 },
-    { name: "May", income: 5500, expenses: 4000 },
-    { name: "Jun", income: 5800, expenses: 4200 },
-  ]
 
   const totalIncome = 5800
   const totalExpenses = 4200
