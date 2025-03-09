@@ -9,6 +9,7 @@ import RecentTransact from "../Components/RecentTransact"
 import BalanceCard from "../Components/BalanceCard"
 import ExpBreakdown from "../Components/ExpBreakdown"
 import IncBreakdown from "../Components/IncBreakdown"
+import ExpxInc from "../Subpages/ExpxInc"
 
 export default function HomePage() {
   
@@ -89,21 +90,7 @@ export default function HomePage() {
           </motion.div>
 
           {/* Income vs Expenses Chart */}
-          <motion.div variants={cardVariants} className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-6 rounded-xl shadow-lg">
-            <h2 className="text-lg font-semibold mb-4">Income vs Expenses</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={incomeVsExpenseData}>
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#1F2937", border: "none" , borderRadius: "10px"}}
-                    itemStyle={{ color: "#FFFFFF" }}
-                  />
-                  <Bar dataKey="income" fill="#60A5FA" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="expenses" fill="#F87171" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
+          <ExpxInc />
 
           {/* Expense Breakdown */}
 

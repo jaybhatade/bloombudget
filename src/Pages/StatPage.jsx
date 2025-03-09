@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import Navbar from '../Components/Navbar';
 
 function StatPage() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('stats');
 
   // Sample stats data - replace with real data from your state/database
   const statsData = {
@@ -22,7 +23,6 @@ function StatPage() {
       { month: 'Jan', expenses: 5800 },
       { month: 'Feb', expenses: 6200 },
       { month: 'Mar', expenses: 6000 },
-      // Add more months as needed
     ]
   };
 
@@ -43,69 +43,127 @@ function StatPage() {
           <h1 className="text-2xl font-bold">Financial Statistics</h1>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-slate-800/50 p-6 rounded-xl"
+        <div className="flex space-x-4 mb-6 border-b border-slate-700/50">
+          <button
+            onClick={() => setActiveTab('stats')}
+            className={`pb-2 px-4 ${
+              activeTab === 'stats'
+                ? 'border-b-2 border-blue-500 text-blue-500'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
           >
-            <h2 className="text-xl font-semibold mb-4">Monthly Overview</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-slate-300">Income</span>
-                <span className="font-medium">₹{statsData.monthlyIncome}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-300">Expenses</span>
-                <span className="font-medium">₹{statsData.monthlyExpenses}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-300">Savings Rate</span>
-                <span className="font-medium text-green-400">{statsData.savingsRate}%</span>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-slate-800/50 p-6 rounded-xl"
+            Stats
+          </button>
+          <button
+            onClick={() => setActiveTab('report')}
+            className={`pb-2 px-4 ${
+              activeTab === 'report'
+                ? 'border-b-2 border-blue-500 text-blue-500'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
           >
-            <h2 className="text-xl font-semibold mb-4">Expense Categories</h2>
-            <div className="space-y-3">
-              {statsData.expenseBreakdown.map((item, index) => (
-                <div key={index} className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <span className="text-slate-300">{item.category}</span>
-                    <span className="text-sm text-slate-400 ml-2">({item.percentage}%)</span>
-                  </div>
-                  <span className="font-medium">₹{item.amount}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+            Report
+          </button>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-slate-800/50 p-6 rounded-xl mb-20"
-        >
-          <h2 className="text-xl font-semibold mb-4">Monthly Trend</h2>
-          <div className="flex justify-between items-end h-40">
-            {statsData.monthlyTrend.map((item, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div 
-                  className="w-12 bg-blue-500/50 rounded-t-md"
-                  style={{ height: `${(item.expenses / statsData.monthlyIncome) * 100}%` }}
-                ></div>
-                <span className="text-sm text-slate-400 mt-2">{item.month}</span>
+        {activeTab === 'stats' ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-slate-800/50 p-6 rounded-xl"
+              >
+                <h2 className="text-xl font-semibold mb-4">Monthly Overview</h2>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-slate-300">Income</span>
+                    <span className="font-medium">₹{statsData.monthlyIncome}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-300">Expenses</span>
+                    <span className="font-medium">₹{statsData.monthlyExpenses}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-300">Savings Rate</span>
+                    <span className="font-medium text-green-400">{statsData.savingsRate}%</span>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-slate-800/50 p-6 rounded-xl"
+              >
+                <h2 className="text-xl font-semibold mb-4">Expense Categories</h2>
+                <div className="space-y-3">
+                  {statsData.expenseBreakdown.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <span className="text-slate-300">{item.category}</span>
+                        <span className="text-sm text-slate-400 ml-2">({item.percentage}%)</span>
+                      </div>
+                      <span className="font-medium">₹{item.amount}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-slate-800/50 p-6 rounded-xl mb-20"
+            >
+              <h2 className="text-xl font-semibold mb-4">Monthly Trend</h2>
+              <div className="flex justify-between items-end h-40">
+                {statsData.monthlyTrend.map((item, index) => (
+                  <div key={index} className="flex flex-col items-center">
+                    <div 
+                      className="w-12 bg-blue-500/50 rounded-t-md"
+                      style={{ height: `${(item.expenses / statsData.monthlyIncome) * 100}%` }}
+                    ></div>
+                    <span className="text-sm text-slate-400 mt-2">{item.month}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </motion.div>
+            </motion.div>
+          </>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-slate-800/50 p-6 rounded-xl mb-20"
+          >
+            <h2 className="text-xl font-semibold mb-4">Financial Report</h2>
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-700/20 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">Income Summary</h3>
+                <p className="text-slate-300">Total Income: ₹{statsData.monthlyIncome}</p>
+              </div>
+              <div className="p-4 bg-slate-700/20 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">Expense Summary</h3>
+                <p className="text-slate-300">Total Expenses: ₹{statsData.monthlyExpenses}</p>
+                <div className="mt-2 space-y-2">
+                  {statsData.expenseBreakdown.map((item, index) => (
+                    <div key={index} className="flex justify-between text-slate-300">
+                      <span>{item.category}</span>
+                      <span>₹{item.amount}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="p-4 bg-slate-700/20 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">Savings</h3>
+                <p className="text-slate-300">Savings Rate: {statsData.savingsRate}%</p>
+                <p className="text-slate-300">Net Savings: ₹{statsData.monthlyIncome - statsData.monthlyExpenses}</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       <Navbar />
