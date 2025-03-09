@@ -10,9 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@genkit-ai/googleai": "^1.1.0",
+    "@google/generative-ai": "^0.24.0",
     "@tailwindcss/vite": "^4.0.12",
     "firebase": "^11.4.0",
     "framer-motion": "^12.4.10",
+    "genkit": "^1.1.0",
     "react": "^19.0.0",
     "react-circular-progressbar": "^2.2.0",
     "react-datepicker": "^8.1.0",
