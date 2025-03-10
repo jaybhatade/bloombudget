@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiX } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import { collection, addDoc, getDocs, serverTimestamp, query, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, serverTimestamp, query, where, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../Firebase';
 
 // Import components
@@ -12,13 +12,14 @@ import AmountInput from '../Components/AmountInput';
 import DateSelector from '../Components/DateSelector';
 import PaymentMethodSelector from '../Components/PaymentMethodSelector';
 import NotesInput from '../Components/NotesInput';
+import { INR } from '../Common/funcs';
 
 function AddPage() {
   const navigate = useNavigate();
   const [transactionType, setTransactionType] = useState("expense");
   const [amount, setAmount] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");  // Changed from "cash" to empty string
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [notes, setNotes] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
@@ -144,6 +145,37 @@ function AddPage() {
       const selectedCategoryObj = categories[transactionType].find(cat => cat.id === selectedCategory);
       const selectedPaymentMethodObj = paymentMethods.find(method => method.id === paymentMethod);
       
+      // Get the current account document
+      const accountDocRef = doc(db, "accounts", paymentMethod);
+      const accountDoc = await getDoc(accountDocRef);
+      
+      if (!accountDoc.exists()) {
+        alert("Selected account no longer exists");
+        return;
+      }
+      
+      const accountData = accountDoc.data();
+      const currentBalance = accountData.balance || 0;
+      
+      // Calculate new balance based on transaction type
+      let newBalance = currentBalance;
+      if (transactionType === "expense") {
+        newBalance = currentBalance - parseFloat(amount);
+        // Prevent negative balance
+        if (newBalance < 0) {
+          alert("Insufficent balance. Please enter a smaller amount.");
+          return;
+        }
+      } else if (transactionType === "income") {
+        newBalance = currentBalance + parseFloat(amount);
+      }
+      
+      // Update the account balance in Firestore
+      await updateDoc(accountDocRef, {
+        balance: newBalance
+      });
+      
+      // Add the transaction
       await addDoc(collection(db, "transactions"), {
         userID,
         type: transactionType,
@@ -156,13 +188,14 @@ function AddPage() {
         paymentMethodName: selectedPaymentMethodObj ? selectedPaymentMethodObj.name : "",
         paymentMethodIcon: selectedPaymentMethodObj ? selectedPaymentMethodObj.icon : "",
         notes: notes.trim(),
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        balanceAfterTransaction: newBalance // Optionally store balance after this transaction
       });
 
       // Success, go back to main screen
       navigate('/');
     } catch (error) {
-      console.error("Error adding transaction:", error);
+      console.error("Error processing transaction:", error);
       alert("Failed to save transaction. Please try again.");
     }
   };
@@ -222,6 +255,30 @@ function AddPage() {
 
         {/* Notes Input */}
         <NotesInput notes={notes} setNotes={setNotes} />
+
+        {/* Account Balance Information */}
+        {paymentMethod && (
+          <div className="bg-slate-800 p-4 rounded-lg">
+            <p className="text-slate-300 mb-2">
+              Selected Account: {paymentMethods.find(m => m.id === paymentMethod)?.name || 'Loading...'}
+            </p>
+            <p className="text-slate-300">
+              Current Balance: ₹{paymentMethods.find(m => m.id === paymentMethod)?.balance?.toFixed(0) || '0'}
+            </p>
+            {amount && (
+              <p className="mt-2">
+                {transactionType === "expense" 
+                  ? <span className={((paymentMethods.find(m => m.id === paymentMethod)?.balance || 0) - parseFloat(amount || 0)) >= 0 ? 'text-green-400' : 'text-red-400'}>
+                      New Balance After Transaction: ₹{((paymentMethods.find(m => m.id === paymentMethod)?.balance || 0) - parseFloat(amount || 0)).toFixed(0)}
+                    </span>
+                  : <span className={((paymentMethods.find(m => m.id === paymentMethod)?.balance || 0) + parseFloat(amount || 0)) >= 0 ? 'text-green-400' : 'text-red-400'}>
+                      New Balance After Transaction: ₹{((paymentMethods.find(m => m.id === paymentMethod)?.balance || 0) + parseFloat(amount || 0)).toFixed(0)}
+                    </span>
+                }
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Submit Button */}
         <button
