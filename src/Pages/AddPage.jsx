@@ -40,15 +40,10 @@ function AddPage() {
       try {
         setLoading(true);
         
-        // Get system payment methods (userID = 'default')
-        const systemPaymentMethodsQuery = query(
-          collection(db, "paymentMethods"), 
-          where("userID", "==", "default")
-        );
         
         // Get user's custom payment methods
         const userPaymentMethodsQuery = query(
-          collection(db, "paymentMethods"),
+          collection(db, "accounts"),
           where("userID", "==", userID)
         );
 
@@ -65,12 +60,10 @@ function AddPage() {
         );
         
         const [
-          systemPaymentMethodsSnapshot,
           userPaymentMethodsSnapshot,
           systemCategoriesSnapshot, 
           userCategoriesSnapshot
         ] = await Promise.all([
-          getDocs(systemPaymentMethodsQuery),
           getDocs(userPaymentMethodsQuery),
           getDocs(systemCategoriesQuery),
           getDocs(userCategoriesQuery)
@@ -79,11 +72,6 @@ function AddPage() {
         // Process payment methods
         const allPaymentMethods = [];
         
-        // Add system payment methods first
-        systemPaymentMethodsSnapshot.forEach(doc => {
-          allPaymentMethods.push({ id: doc.id, ...doc.data() });
-        });
-
         // Add user payment methods
         userPaymentMethodsSnapshot.forEach(doc => {
           allPaymentMethods.push({ id: doc.id, ...doc.data() });
