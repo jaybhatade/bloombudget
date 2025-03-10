@@ -103,7 +103,7 @@ function IncBreakdown() {
 
       setTotalIncome(monthlyTotal);
 
-      const colors = ["#FF6B6B", "#4ECDC4", "#FFD166", "#6A0572", "#1A535C"];
+      const colors = ["#3b82f6", "#4ECDC4", "#FFD166", "#6A0572", "#1A535C", "#10B981", "#84CC16", "#06B6D4", "#8B5CF6", "#F59E0B"];
       const processedData = Array.from(categoryMap).map(([name, value], index) => ({
         name,
         value,

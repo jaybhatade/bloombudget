@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../Firebase'
 import { motion } from 'framer-motion'
+import { INR } from '../Common/funcs'
 
 function BalanceCard() {
   const [totalIncome, setTotalIncome] = useState(0)
@@ -76,18 +77,18 @@ function BalanceCard() {
             {loading ? (
               <p className="text-3xl font-bold">Loading...</p>
             ) : (
-              <p className="text-3xl font-bold">₹{(totalIncome - totalExpenses).toLocaleString()}</p>
+              <p className="text-3xl font-bold">{INR}{(totalIncome - totalExpenses).toLocaleString()}</p>
             )}
           </div>
           {!loading && (
             <div className="flex flex-col gap-2">
               <div>
                 <p className="text-slate-400 text-sm">Income</p>
-                <p className="text-green-400 font-medium">₹{totalIncome.toLocaleString()}</p>
+                <p className="text-green-400 font-medium">{INR}{totalIncome.toLocaleString()}</p>
               </div>
               <div>
                 <p className="text-slate-400 text-sm">Expenses</p>
-                <p className="text-red-400 font-medium">₹{totalExpenses.toLocaleString()}</p>
+                <p className="text-red-400 font-medium">{INR}{totalExpenses.toLocaleString()}</p>
               </div>
             </div>
           )}

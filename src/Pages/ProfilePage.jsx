@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import Navbar from '../Components/Navbar'
 import { FiChevronRight, FiStar, FiSettings, FiDollarSign, FiLogOut } from 'react-icons/fi'
-import { FaUniversity } from "react-icons/fa";
+import { FaUniversity, FaWallet } from "react-icons/fa";
 import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../Firebase'
 
@@ -134,6 +134,15 @@ function ProfilePage() {
             <FiChevronRight className="text-slate-400" />
           </motion.button>
 
+          <motion.button className="w-full  border-b border-slate-800 hover:bg-slate-800 transition-colors" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
+            <Link to={"/accounts"} className='flex items-center justify-between px-6 py-4'>
+            <div  className="flex items-center">
+              <FaWallet className="text-slate-300 w-6 h-6" />
+              <span className="ml-3">Manage Accounts</span>
+            </div>
+            <FiChevronRight className="text-slate-400" />
+            </Link>
+          </motion.button>
 
           <motion.button className="w-full flex items-center justify-between px-6 py-4 border-b-2  border-slate-900 bg-slate-800 cursor-not-allowed" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }} disabled>
             <div className="flex items-center">

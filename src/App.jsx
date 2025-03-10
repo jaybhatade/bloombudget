@@ -18,6 +18,7 @@ import { db } from "./Firebase";
 import AllTransactions from "./Subpages/AllTransactions";
 import Budget from "./Subpages/Budget";
 import { PuffLoader } from "react-spinners";
+import Accounts from "./Subpages/Accounts";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -113,6 +114,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/accounts"
+            element={
+              <ProtectedRoute>
+                <Accounts />
               </ProtectedRoute>
             }
           />

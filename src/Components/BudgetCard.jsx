@@ -2,6 +2,7 @@ import React from 'react'
 import { motion } from "framer-motion"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
+import { INR } from '../Common/funcs'
 
 function BudgetCard() {
       // Sample data
@@ -31,9 +32,9 @@ function BudgetCard() {
               </div>
               <div className="ml-6">
                 <p className="text-slate-400 mb-1">Spent</p>
-                <p className="text-xl font-bold">₹{totalExpenses.toLocaleString()}</p>
+                <p className="text-xl font-bold">{INR}{totalExpenses.toLocaleString()}</p>
                 <p className="text-slate-400 mt-2 mb-1">Remaining</p>
-                <p className="text-xl font-bold">₹{(6000 - totalExpenses).toLocaleString()}</p>
+                <p className="text-xl font-bold">{INR}{(6000 - totalExpenses).toLocaleString()}</p>
               </div>
             </div>
           </motion.div>
