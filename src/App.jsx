@@ -17,6 +17,7 @@ import { getDoc, doc } from "firebase/firestore";
 import { db } from "./Firebase";
 import AllTransactions from "./Subpages/AllTransactions";
 import Budget from "./Subpages/Budget";
+import { PuffLoader } from "react-spinners";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -61,7 +62,11 @@ function ProtectedRoute({ children }) {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <PuffLoader color="#3b82f6" size={100} />
+      </div>
+    );
   }
 
   if (!isAuthenticated) {

@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Components/Navbar';
 import Statstab from '../Subpages/Statstab';
+import ReportTab from '../Subpages/ReportTab';
 
 function StatPage() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('stats');
 
   const statsData = {
     monthlyIncome: 10000,
@@ -42,7 +44,38 @@ function StatPage() {
           <h1 className="text-2xl font-bold">Financial Statistics</h1>
         </motion.div>
 
-        <Statstab />
+        <div className="flex space-x-4 mb-6 border-b border-slate-700/50">
+          <button
+            onClick={() => setActiveTab('stats')}
+            className={`pb-2 px-4 ${
+              activeTab === 'stats'
+                ? 'border-b-2 border-blue-500 text-blue-500'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            Stats
+          </button>
+          <button
+            onClick={() => setActiveTab('report')}
+            className={`pb-2 px-4 ${
+              activeTab === 'report'
+                ? 'border-b-2 border-blue-500 text-blue-500'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            Report
+          </button>
+        </div>
+
+        {activeTab === 'stats' ? (
+          <>
+            <Statstab />
+          </>
+        ) : (
+          <>
+            <ReportTab />
+          </>
+        )}
       </div>
 
       <Navbar />

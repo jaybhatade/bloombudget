@@ -134,14 +134,6 @@ function ProfilePage() {
             <FiChevronRight className="text-slate-400" />
           </motion.button>
 
-          {/* Settings */}
-          <motion.button className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-800 hover:bg-slate-800 transition-colors" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
-            <div className="flex items-center">
-              <FiSettings className="text-slate-400 w-6 h-6" />
-              <span className="ml-3">Settings</span>
-            </div>
-            <FiChevronRight className="text-slate-400" />
-          </motion.button>
 
           <motion.button className="w-full flex items-center justify-between px-6 py-4 border-b-2  border-slate-900 bg-slate-800 cursor-not-allowed" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }} disabled>
             <div className="flex items-center">
