@@ -100,7 +100,7 @@ const BudgetForm = ({ formData, setFormData, categories, onSubmit, onCancel, isE
               min="0"
               required
             />
-          </div>
+          </div> 
   
           {/* Month Selection */}
           <div>

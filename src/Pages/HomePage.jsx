@@ -102,12 +102,10 @@ export default function HomePage() {
             <BalanceCard />
 
             {/* Income vs Expenses Chart */}
-            <ExpxInc />
 
             {/* Expense Breakdown */}
             <ExpBreakdown />
 
-            <IncBreakdown />
           </motion.div>
         </main>
       )}
