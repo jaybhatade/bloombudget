@@ -82,8 +82,8 @@ export default function HomePage() {
             }}
             className="space-y-6"
           >
+            <BalanceCard />
             {/* Budget Progress */}
-            <BudgetCard />
 
             <motion.div variants={cardVariants} className="flex rounded-lg w-full justify-center items-center">
               <Link 
@@ -99,7 +99,7 @@ export default function HomePage() {
 
             <RecentTransact />
 
-            <BalanceCard />
+            <BudgetCard />
 
             {/* Income vs Expenses Chart */}
 
