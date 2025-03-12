@@ -160,9 +160,9 @@ function BalanceCard() {
       {/* Balance Card */}
       <motion.div
         variants={cardVariants}
-        className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-6 rounded-xl shadow-lg"
+        className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-6 rounded-xl shadow-lg h-full flex flex-col justify-between" 
       >
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center">
           <div>
             <h2 className="text-slate-400 mb-1">Total Balance</h2>
             {loading ? (

@@ -29,7 +29,8 @@ function StatPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      <div className="p-4">
+      {/* Main content with padding for desktop side nav */}
+      <div className="p-4 pb-24 lg:pl-72">
         <motion.div 
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -51,7 +52,7 @@ function StatPage() {
               activeTab === 'stats'
                 ? 'border-b-2 border-blue-500 text-blue-500'
                 : 'text-slate-400 hover:text-slate-200'
-            }`}
+            } transition-colors duration-200`}
           >
             Stats
           </button>
@@ -61,21 +62,32 @@ function StatPage() {
               activeTab === 'report'
                 ? 'border-b-2 border-blue-500 text-blue-500'
                 : 'text-slate-400 hover:text-slate-200'
-            }`}
+            } transition-colors duration-200`}
           >
             Report
           </button>
         </div>
 
-        {activeTab === 'stats' ? (
-          <>
-            <Statstab />
-          </>
-        ) : (
-          <>
-            <ReportTab />
-          </>
-        )}
+        {/* Tab content container with responsive layout */}
+        <div className="w-full">
+          {activeTab === 'stats' ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Statstab />
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ReportTab />
+            </motion.div>
+          )}
+        </div>
       </div>
 
       <Navbar />
