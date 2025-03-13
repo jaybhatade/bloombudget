@@ -4,6 +4,8 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import "react-circular-progressbar/dist/styles.css";
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../Firebase';
+import { Link } from 'react-router-dom';
+import { CiCirclePlus } from "react-icons/ci";
 
 function BudgetCard() {
   const [budgets, setBudgets] = useState([]);
@@ -114,6 +116,28 @@ function BudgetCard() {
     );
   }
 
+  // Check if there are no budgets
+  if (budgets.length === 0) {
+    return (
+      <motion.div
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full h-full"
+      >
+        <Link to="/budget" className="block h-full">
+          <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-4 rounded-lg h-full flex flex-col items-center justify-center">
+            <CiCirclePlus size={48} className="text-blue-400 mb-3" />
+            <div className="text-lg font-semibold text-white">Add Budget</div>
+            <p className="text-slate-400 text-sm text-center mt-2">
+              Start tracking your expenses by setting up budgets
+            </p>
+          </div>
+        </Link>
+      </motion.div>
+    );
+  }
+
   // Calculate totals for all budgets
   const totalBudget = budgets.reduce((sum, budget) => sum + (budget.amount || 0), 0);
   
@@ -136,16 +160,17 @@ function BudgetCard() {
     >
       {/* Overview Section */}
       <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-4 rounded-lg h-full">
+      <Link to="/budget">
         <div className="mb-3">
           <h2 className="text-lg font-semibold">Budget Overview</h2>
         </div>
         
-        <div className="flex  mb-4 justify-between items-center">
-          <div className=" rounded-lg">
+        <div className="flex mb-4 justify-between items-center">
+          <div className="rounded-lg">
             <div className="text-slate-300 text-sm mb-1">Total Budget</div>
             <div className="text-lg font-bold text-white">₹{totalBudget.toLocaleString()}</div>
           </div>
-          <div className=" rounded-lg">
+          <div className="rounded-lg">
             <div className="text-slate-300 text-sm mb-1">Total Spent</div>
             <div className="text-lg font-bold text-red-400">₹{totalSpent.toLocaleString()}</div>
           </div>
@@ -187,6 +212,7 @@ function BudgetCard() {
         <div className="text-xs text-slate-400 mt-3">
           Based on {transactions.length} transactions across {budgets.length} budget categories
         </div>
+        </Link>
       </div>
     </motion.div>
   );
