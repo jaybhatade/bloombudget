@@ -1,88 +1,56 @@
 {
-  "users": {
-    "userID_123": {
-      "email": "user@example.com",
-      "displayName": "John Doe",
-      "currency": "INR",
-      "createdAt": "timestamp"
+  "users": {                                // Collection
+    "fTwPv0vGLx4eTP13QTGy": {              // Document
+      "email": "testa1@gmail.com",         // string
+      "name": "Jay Bhatade",               // string
+      "password": "testa1",                // string
+      "role": "User"                       // string
     }
   },
-
-  "transactions": {
-    "transactionID_456": {
-      "userID": "userID_123",
-      "type": "expense",  // "income" or "expense"
-      "amount": 100,
-      "category": "Food",
-      "date": "timestamp",
-      "paymentMethod": "Credit Card",
-      "notes": "Dinner with friends"
+  "transactions": {                        // Collection
+    "qZ57jsoXPnknyzSZxrdr": {              // Document
+      "amount": 100,                       // number
+      "balanceAfterTransaction": 900,       // number
+      "category": "ZVNC6jDERHuFNf8XIIaO",  // string (reference to category ID)
+      "categoryIcon": "📚",                // string
+      "categoryName": "Education",          // string
+      "createdAt": "2025-03-13T09:42:52+05:30", // timestamp
+      "date": "2025-03-13T09:40:09+05:30", // timestamp
+      "notes": "",                         // string
+      "paymentMethod": "1rVJgXlAb9SCvymQGugp", // string (reference to payment method ID)
+      "paymentMethodIcon": "🏦",            // string
+      "paymentMethodName": "Bank Account",  // string
+      "type": "expense",                   // string
+      "userID": "0UMp7oaQOGkjKgDF6rcM"      // string (reference to user ID)
     }
   },
-
-  "budgets": {
-    "budgetID_001": {
-      "userID": "userID_123",
-      "category": "Food", || "Main
-      "amount": 500,
-      "month": "Janaury"
+  "categories": {                          // Collection
+    "8bqvEZGXEh2f5MHpOXsq": {              // Document
+      "createdAt": "2025-03-10T00:09:16+05:30", // timestamp
+      "icon": "💵",                        // string
+      "name": "Other Income",              // string
+      "type": "income",                    // string
+      "userID": "default"                  // string (can be "default" or userID)
     }
   },
-
-  "ai_insights": {
-    "insightID_101": {
-      "userID": "userID_123",
-      "analysis": "Based on your spending, you exceeded your budget for Food.",
-      "suggestions": ["Reduce eating out", "Try meal prepping"],
-      "createdAt": "timestamp"
+  "budgets": {                             // Collection
+    "lfLIHv3zA2KGs7EP35Vd": {              // Document
+      "amount": 500,                       // number
+      "category": "GBbR1EdKndnaD7nHrgmm",  // string (reference to category ID)
+      "categoryName": "Phone",              // string
+      "createdAt": "2025-03-13T09:44:50+05:30", // timestamp
+      "month": "March",                     // string
+      "userID": "0UMp7oaQOGkjKgDF6rcM"      // string (reference to user ID)
+    }
+  },
+  "accounts": {                            // Collection
+    "1rVJgXlAb9SCvymQGugp": {              // Document
+      "balance": 900,                      // number
+      "createdAt": "2025-03-10T18:51:00+05:30", // timestamp
+      "icon": "🏦",                        // string
+      "name": "Bank Account",              // string
+      "updatedAt": "2025-03-13T09:34:56+05:30", // timestamp
+      "userID": "0UMp7oaQOGkjKgDF6rcM"      // string (reference to user ID)
     }
   }
 }
-
-
------Local Storage-------
-const userData = {
-userId,
-email: user.email,
-name: user.name,
-role: user.role,
-};
-localStorage.setItem("user", JSON.stringify(userData));
-
-
-
-
------ Final ------
-{
-  "subscriptions" (Collection): {
-    "subscriptionID_001" (Document): {
-      "userID": "userID_123",
-      "name": "Netflix",
-      "amount": 15.99,
-      "category": "Entertainment",
-      "paymentMethod": "Credit Card",
-      "billingCycle": "Monthly", 
-      "nextBillingDate": "2025-04-01",
-      "status": "Active",  // Active, Canceled, Expired
-      "createdAt": "timestamp"
-    }
-  },
-
-  "transactions": {
-    "transactionID_456": {
-      "userID": "userID_123",
-      "type": "expense",  // "income" or "expense"
-      "amount": 100,
-      "category": "Food",
-      "date": "timestamp",
-      "paymentMethod": "Credit Card",
-      "notes": "Dinner with friends"
-    }
-  },
-
-categories (Collection)
-  - categoryID (Document)
-    - name: "Entertainment"
-    icon: "😂"
-    - type: "expense"
-    - userID: "default" (for system categories) or "user123" (for custom ones)
