@@ -1,12 +1,13 @@
 import React from 'react';
 
-function TransactionTypeSelector({ transactionType, setTransactionType, setSelectedCategory }) {
+function TransactionTypeSelector({ transactionType, setTransactionType, setSelectedCategory, setTransferToAccount }) {
   return (
     <div className="mx-4 my-6">
       <div className="flex rounded-lg overflow-hidden shadow-lg">
         {[
           {type: "expense", color: "bg-red-500"},
-          {type: "income", color: "bg-green-500"}
+          {type: "income", color: "bg-green-500"},
+          {type: "transfer", color: "bg-blue-500"}
         ].map(({type, color}) => (
           <button
             key={type}
@@ -18,6 +19,10 @@ function TransactionTypeSelector({ transactionType, setTransactionType, setSelec
             onClick={() => {
               setTransactionType(type);
               setSelectedCategory("");
+              // Reset transfer account when changing transaction types
+              if (setTransferToAccount) {
+                setTransferToAccount("");
+              }
             }}
           >
             {type.charAt(0).toUpperCase() + type.slice(1)}
