@@ -215,30 +215,31 @@ function AddPage() {
           updatedAt: serverTimestamp()
         });
         
-        // Store the transfer transaction
+        // Store the transfer transaction in the new TransferTransactions collection
         const sourceAccount = paymentMethods.find(m => m.id === paymentMethod);
         const destAccount = paymentMethods.find(m => m.id === transferToAccount);
         
-        await addDoc(collection(db, "transactions"), {
+        await addDoc(collection(db, "TransferTransactions"), {
           userID,
-          type: "transfer",
           amount: parsedAmount,
           date: selectedDate,
           // Source account details
-          paymentMethod,
-          paymentMethodName: sourceAccount?.name || "",
-          paymentMethodIcon: sourceAccount?.icon || "",
+          sourceAccountId: paymentMethod,
+          sourceAccountName: sourceAccount?.name || "",
+          sourceAccountIcon: sourceAccount?.icon || "",
+          sourceBalanceBefore: sourceBalance,
+          sourceBalanceAfter: newSourceBalance,
           // Destination account details
-          transferToAccount,
-          transferToAccountName: destAccount?.name || "",
-          transferToAccountIcon: destAccount?.icon || "",
+          destinationAccountId: transferToAccount,
+          destinationAccountName: destAccount?.name || "",
+          destinationAccountIcon: destAccount?.icon || "",
+          destinationBalanceBefore: destBalance,
+          destinationBalanceAfter: newDestBalance,
           // Other details
           notes: notes.trim(),
-          createdAt: serverTimestamp(),
-          sourceBalanceAfter: newSourceBalance,
-          destBalanceAfter: newDestBalance
+          createdAt: serverTimestamp()
         });
-        
+               
       } else {
         // ===== REGULAR EXPENSE/INCOME HANDLING =====
         const selectedCategoryObj = categories[transactionType].find(cat => cat.id === selectedCategory);
@@ -399,6 +400,7 @@ function AddPage() {
 
         {/* Notes Input */}
         <NotesInput notes={notes} setNotes={setNotes} />
+
 
         {/* Balance Information */}
         {paymentMethod && (

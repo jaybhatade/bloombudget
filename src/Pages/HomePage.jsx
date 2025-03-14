@@ -1,10 +1,12 @@
 import React from "react"
 import { useState, useEffect, Suspense }from "react"
 import { motion } from "framer-motion"
+import { FiPieChart, FiRefreshCw } from 'react-icons/fi'
 import Head from "../Components/Head"
 import Navbar from "../Components/Navbar"
 import RecentTransact from "../Components/RecentTransact"
 import BalanceCard from "../Components/BalanceCard"
+import ExpBreakdown from "../Components/ExpBreakdown"
 import BudgetCard from "../Components/BudgetCard"
 import InitialBalanceModal from "../SubComponents/InitialBalanceModal"
 import { collection, query, where, getDocs } from 'firebase/firestore'
@@ -16,7 +18,10 @@ export default function HomePage() {
   const [showInitBalModal, setShowInitBalModal] = useState(false)
   const [loading, setLoading] = useState(true)
   const [hasAccounts, setHasAccounts] = useState(true)
-
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -69,7 +74,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-slate-900 text-white">
       <div className="lg:hidden">
 
       <Head />
@@ -81,7 +86,7 @@ export default function HomePage() {
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
-        <main className="p-4 pb-24 lg:pl-72">
+        <main className="p-4 pt-6 pb-24 lg:pl-72 bg-slate-950 rounded-t-4xl border-t border-slate-700">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Dashboard</h1>
 
@@ -102,6 +107,7 @@ export default function HomePage() {
          
 
                 <BudgetCard />
+
             </div>
             
           </motion.div>

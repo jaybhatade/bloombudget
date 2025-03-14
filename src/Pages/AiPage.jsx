@@ -382,9 +382,11 @@ function AiPage() {
   };
 
   const getMessageClass = (role) => {
-    return role === 'user' 
-      ? "p-4 bg-gradient-to-r from-blue-600/30 to-blue-500/30 rounded-xl ml-8" 
-      : "p-4 bg-gradient-to-r from-slate-700/50 to-slate-600/50 rounded-xl mr-8";
+    if (role === 'user') {
+      return "p-2 px-4 bg-blue-500 rounded-b-xl rounded-tl-xl text-white self-end max-w-[80%]";
+    } else {
+      return "self-start mb-4";
+    }
   };
 
   // Auto-resize textarea as content grows
@@ -409,7 +411,7 @@ function AiPage() {
         <h1 className="text-2xl font-bold">Financial AI Assistant</h1>
       </motion.div>
       <motion.div 
-        className="flex-1 bg-slate-800/50 backdrop-blur-lg p-4 rounded-xl shadow-lg flex flex-col"
+        className="flex-1 p-4 rounded-xl shadow-lg flex flex-col"
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ duration: 0.3 }}
@@ -441,17 +443,14 @@ function AiPage() {
                   {message.role === 'assistant' && (
                     <h2 className="font-semibold text-blue-400 mb-2">AI Assistant:</h2>
                   )}
-                  {message.role === 'user' && (
-                    <h2 className="font-semibold text-green-400 mb-2">You:</h2>
-                  )}
-                  <p className="text-slate-200 whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                  <p className="text-slate-200 text-md whitespace-pre-wrap leading-relaxed">{message.content}</p>
                 </motion.div>
               ))}
               {isLoading && (
                 <motion.div 
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  className="p-4 bg-gradient-to-r from-slate-700/50 to-slate-600/50 rounded-xl mr-8"
+                  className="p-2 rounded-xl mr-8"
                 >
                   <div className="flex items-center">
                     <h2 className="font-semibold text-blue-400 mr-2">AI Assistant:</h2>
