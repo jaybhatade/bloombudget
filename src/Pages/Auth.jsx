@@ -237,10 +237,10 @@ const AuthPage = () => {
                 </motion.h2>
                 
                 <motion.div 
-                    className="text-slate-300 text-center mb-6"
+                    className="text-slate-300 text-center"
                     variants={childVariants}
                 >
-                    {isLogin ? "Sign in to your account" : "Sign up to start your journey!"}
+                    {isLogin ? "Login to your account" : "Sign up to track your finances!"}
                 </motion.div>
                 
                 <motion.div 
@@ -288,7 +288,7 @@ const AuthPage = () => {
                             type="email"
                             name="email"
                             required
-                            placeholder="Enter your email"
+                            placeholder="abc@example.com"
                             className="w-full p-3 bg-slate-700/40 border border-slate-600 text-white rounded-lg focus:outline-none transition-all duration-300"
                             value={formData.email}
                             onChange={handleChange}
@@ -320,7 +320,7 @@ const AuthPage = () => {
                                 type="text"
                                 name="name"
                                 required
-                                placeholder="Enter your full name"
+                                placeholder="Your name "
                                 className="w-full p-3 bg-slate-700/40 border border-slate-600 text-white rounded-lg focus:outline-none transition-all duration-300"
                                 value={formData.name}
                                 onChange={handleChange}
@@ -349,7 +349,7 @@ const AuthPage = () => {
                             type="password"
                             name="password"
                             required
-                            placeholder={isLogin ? "Enter your password" : "Create a password"}
+                            placeholder={isLogin ? "Your password" : "Create a password"}
                             className="w-full p-3 bg-slate-700/40 border border-slate-600 text-white rounded-lg focus:outline-none transition-all duration-300"
                             value={formData.password}
                             onChange={handleChange}
@@ -377,7 +377,7 @@ const AuthPage = () => {
                                 {isLogin ? "Signing in..." : "Signing up..."}
                             </div>
                         ) : (
-                            isLogin ? "Sign In" : "Sign Up"
+                            isLogin ? "Login" : "Sign Up"
                         )}
                     </motion.button>
                 </form>
@@ -393,7 +393,7 @@ const AuthPage = () => {
                         transition={{ duration: 0.2 }}
                         className="text-blue-400 font-medium ml-2"
                     >
-                        {isLogin ? "Sign Up" : "Sign In"}
+                        {isLogin ? "Sign Up" : "Login"}
                     </motion.button>
                 </motion.div>
             </motion.div>

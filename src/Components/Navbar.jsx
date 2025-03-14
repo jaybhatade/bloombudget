@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
-import { FiHome, FiPieChart, FiPlus, FiUser } from "react-icons/fi"
-import { HiOutlineSparkles } from "react-icons/hi2"
-import { Link, useLocation } from "react-router-dom"
-import { motion } from "framer-motion"
+import { useEffect, useState } from "react";
+import { FiHome, FiPieChart, FiPlus, FiUser } from "react-icons/fi";
+import { HiOutlineSparkles } from "react-icons/hi2";
+import { Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 
 function Navbar() {
     const location = useLocation();
@@ -25,7 +25,7 @@ function Navbar() {
             {/* Desktop Side Navigation */}
             <div className="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-slate-800 border-r border-slate-700 flex-col">
                 <div className="p-6 mb-4">
-                    <h1 className="text-xl font-bold text-white">App Name</h1>
+                    <h1 className="text-xl font-bold text-white">Bloom Budget</h1>
                 </div>
                 <div className="flex flex-col flex-1 px-3">
                     {navItems.map((item) => (
@@ -39,7 +39,9 @@ function Navbar() {
                             } transition-colors duration-200`}
                         >
                             <item.icon className={`text-xl mr-3 ${activeTab === item.id ? "text-blue-400" : ""}`} />
-                            <span className={`${activeTab === item.id ? "font-medium" : ""}`}>{item.label}</span>
+                            <span className={`${activeTab === item.id ? "font-medium" : ""}`}>
+                                {item.label}
+                            </span>
                             {activeTab === item.id && (
                                 <motion.div
                                     layoutId="activeSideTab"
@@ -51,12 +53,6 @@ function Navbar() {
                         </Link>
                     ))}
                 </div>
-                <div className="p-6 mt-auto">
-                    <div className="flex items-center text-slate-400">
-                        <div className="w-8 h-8 bg-slate-600 rounded-full mr-3"></div>
-                        <span className="text-sm">User Name</span>
-                    </div>
-                </div>
             </div>
 
             {/* Mobile Bottom Navigation */}
@@ -66,7 +62,7 @@ function Navbar() {
                         <Link
                             to={item.path}
                             key={item.id}
-                            className={`flex flex-col items-center justify-center p-3 w-full ${
+                            className={`flex flex-col items-center justify-center p-4 w-full ${
                                 activeTab === item.id 
                                     ? item.id === "plus" 
                                         ? "text-blue-500" 
@@ -82,14 +78,15 @@ function Navbar() {
                                 </div>
                             ) : (
                                 <item.icon 
-                                    className={`text-xl mb-1 ${
+                                    className={`text-xl ${
                                         activeTab === item.id 
                                             ? "scale-110 transform" 
                                             : ""
                                     }`} 
                                 />
                             )}
-                            <span className="text-xs">{item.label}</span>
+                            {/* Hide label on mobile */}
+                            <span className="text-xs lg:block hidden">{item.label}</span>
                             {activeTab === item.id && (
                                 <motion.div
                                     layoutId="activeTab"
@@ -106,7 +103,7 @@ function Navbar() {
             {/* Content padding for desktop */}
             <div className="hidden lg:block w-64"></div>
         </>
-    )
+    );
 }
 
-export default Navbar
+export default Navbar;
