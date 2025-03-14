@@ -81,7 +81,7 @@ export default function HomePage() {
           variants={containerVariants}
           className="space-y-6"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-4">
             <BalanceCard />
             <RecentTransact />
           </div>
@@ -112,11 +112,11 @@ export default function HomePage() {
       </div>
       
       {/* Tabs */}
-      <div className="px-4 pt-4 lg:pl-72 rounded-t-4xl border-t border-slate-700 bg-slate-950">
+      <div className="px-4 pt-4 lg:pl-72 rounded-t-4xl lg:rounded-none border-t border-slate-700 bg-slate-950">
         <div className="flex space-x-2 justify-center">
           <button 
             onClick={() => setActiveTab('dashboard')} 
-            className={`px-4 py-2 font-medium rounded-t-lg transition ${
+            className={`px-4 py-2 font-medium rounded-t-lg  transition ${
               activeTab === 'dashboard' 
                 ? 'bg-slate-950 text-blue-400 border-b-2 border-blue-400' 
                 : 'text-slate-400 hover:text-white'

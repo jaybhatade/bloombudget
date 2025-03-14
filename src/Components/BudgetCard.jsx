@@ -181,7 +181,7 @@ function BudgetCard() {
       variants={cardVariants}
       initial="hidden"
       animate="visible"
-      className="w-full h-full"
+      className="w-full h-full max-w-4xl mx-auto"
     >
       {/* Overview Section */}
       <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-4 rounded-lg h-full">

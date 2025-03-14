@@ -274,7 +274,7 @@ function AddCategoryModal({
               onClick={() => setNewCategoryModal(false)}
               className="px-4 py-2 bg-slate-800 rounded-lg text-slate-300 hover:bg-slate-700"
             >
-              Cancel
+              Cancel 
             </button>
             <button
               type="button"

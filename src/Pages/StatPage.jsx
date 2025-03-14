@@ -36,12 +36,6 @@ function StatPage() {
           animate={{ y: 0, opacity: 1 }}
           className="flex items-center mb-6"
         >
-          <button 
-            onClick={() => navigate(-1)}
-            className="mr-4 text-slate-400 hover:text-white transition-colors"
-          >
-            <FiArrowLeft size={24} />
-          </button>
           <h1 className="text-2xl font-bold">Financial Statistics</h1>
         </motion.div>
 
