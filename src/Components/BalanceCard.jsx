@@ -93,6 +93,7 @@ function BalanceCard() {
 
     setTotalIncome(monthlyIncome)
     setTotalExpenses(monthlyExpenses)
+    setTotalBalance(monthlyIncome - monthlyExpenses)
   }
 
   useEffect(() => {
@@ -104,7 +105,7 @@ function BalanceCard() {
           return
         }
 
-        // 1. Fetch transactions for monthly income/expense
+        // Fetch transactions for monthly income/expense
         const transactionsQuery = query(
           collection(db, 'transactions'),
           where('userID', '==', userID)
@@ -118,21 +119,6 @@ function BalanceCard() {
           })
         })
         setTransactions(fetchedTransactions)
-
-        // 2. Fetch accounts for total balance
-        const accountsQuery = query(
-          collection(db, 'accounts'),
-          where('userID', '==', userID)
-        )
-        const accountsSnapshot = await getDocs(accountsQuery)
-        let accountsBalance = 0
-        accountsSnapshot.forEach((doc) => {
-          const accountData = doc.data()
-          if (accountData.balance) {
-            accountsBalance += accountData.balance
-          }
-        })
-        setTotalBalance(accountsBalance)
 
         setLoading(false)
       } catch (error) {
@@ -160,9 +146,9 @@ function BalanceCard() {
       {/* Balance Card */}
       <motion.div
         variants={cardVariants}
-        className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-6 rounded-xl shadow-lg h-full flex flex-col justify-between" 
+        className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-3 rounded-xl shadow-lg h-full flex flex-col justify-between" 
       >
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center px-2">
           <div>
             <h2 className="text-slate-400 mb-1">Total Balance</h2>
             {loading ? (

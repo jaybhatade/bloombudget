@@ -1,23 +1,22 @@
 import React from "react"
-import { useState, useEffect, Suspense }from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { FiPieChart, FiRefreshCw } from 'react-icons/fi'
 import Head from "../Components/Head"
 import Navbar from "../Components/Navbar"
 import RecentTransact from "../Components/RecentTransact"
 import BalanceCard from "../Components/BalanceCard"
-import ExpBreakdown from "../Components/ExpBreakdown"
+import Budget from "../Subpages/Budget"
 import BudgetCard from "../Components/BudgetCard"
 import InitialBalanceModal from "../SubComponents/InitialBalanceModal"
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../Firebase'
 
-
-
 export default function HomePage() {
   const [showInitBalModal, setShowInitBalModal] = useState(false)
   const [loading, setLoading] = useState(true)
   const [hasAccounts, setHasAccounts] = useState(true)
+  const [activeTab, setActiveTab] = useState('dashboard')
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -73,11 +72,69 @@ export default function HomePage() {
     setShowInitBalModal(false)
   }
 
+  const renderTabContent = () => {
+    if (activeTab === 'dashboard') {
+      return (
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="space-y-6"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <BalanceCard />
+            <RecentTransact />
+          </div>
+        </motion.div>
+      )
+    } else if (activeTab === 'budget') {
+      return (
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="space-y-6"
+        >
+          <div className="">
+            <BudgetCard />
+
+            <Budget />
+          </div>
+        </motion.div>
+      )
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       <div className="lg:hidden">
-
-      <Head />
+        <Head />
+      </div>
+      
+      {/* Tabs */}
+      <div className="px-4 pt-4 lg:pl-72 rounded-t-4xl border-t border-slate-700 bg-slate-950">
+        <div className="flex space-x-2 justify-center">
+          <button 
+            onClick={() => setActiveTab('dashboard')} 
+            className={`px-4 py-2 font-medium rounded-t-lg transition ${
+              activeTab === 'dashboard' 
+                ? 'bg-slate-950 text-blue-400 border-b-2 border-blue-400' 
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Dashboard
+          </button>
+          <button 
+            onClick={() => setActiveTab('budget')} 
+            className={`px-4 py-2 font-medium rounded-t-lg transition ${
+              activeTab === 'budget' 
+                ? 'bg-slate-950 text-blue-400 border-b-2 border-blue-400' 
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Budget
+          </button>
+        </div>
       </div>
       
       {/* Main Content */}
@@ -86,31 +143,9 @@ export default function HomePage() {
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
-        <main className="p-4 pt-6 pb-24 lg:pl-72 bg-slate-950 rounded-t-4xl border-t border-slate-700">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-
-          </div>
-          
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-            className="space-y-6"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-                <BalanceCard />
-
-
-                <RecentTransact />
+        <main className="p-4 pb-24 lg:pl-72 bg-slate-950 ">
          
-
-                <BudgetCard />
-
-            </div>
-            
-          </motion.div>
+          {renderTabContent()}
         </main>
       )}
 

@@ -339,30 +339,7 @@ function Budget() {
     }
   });
 
-  const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
-  const totalSpent = transactions
-  .filter(t => {
-    // Basic expense transaction check
-    if (t.type !== "expense" || !t.amount || typeof t.amount !== 'number') {
-      return false;
-    }
-    
-    // Check if transaction category is in our budget categories set
-    if (t.category) {
-      const normalizedCategory = t.category.toLowerCase().trim();
-      return budgetCategories.has(normalizedCategory);
-    }
-    
-    return false;
-  })
-  .reduce((sum, transaction) => sum + transaction.amount, 0);
   
-
-
-  const remainingBudget = totalBudget - totalSpent;
-  const budgetUsagePercentage = totalBudget > 0 
-    ? Math.min(Math.round((totalSpent / totalBudget) * 100), 100) 
-    : 0;
   
   // Group budgets by category for display (using categoryName instead of category)
   const budgetsByCategory = budgets.reduce((acc, budget) => {
@@ -397,17 +374,7 @@ function Budget() {
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <Link to="/" className="mr-3 text-slate-400 hover:text-white">
-            <FiArrowLeft size={20} />
-          </Link>
-          <h1 className="text-xl font-bold">Budget Dashboard</h1>
-        </div>
-        
-
-      </div>
+    <div className="mt-4 max-w-4xl mx-auto">
 
       {/* Budget Form */}
       {showForm && (
@@ -421,32 +388,6 @@ function Budget() {
         />
       )}
       
-      {/* Overview Section */}
-      <div className="bg-slate-800/50 p-4 rounded-lg mb-4">
-        <h2 className="text-lg font-semibold mb-3">Overview</h2>
-        
-        <div className="flex justify-between pb-6 pt-4">
-          <StatsCard title="Total Budget" value={`₹${totalBudget.toLocaleString()}`} />
-          <StatsCard title="Total Spent" value={`₹${totalSpent.toLocaleString()}`} textColor="text-red-400" />
-          <StatsCard 
-            title="Remaining" 
-            value={`₹${remainingBudget.toLocaleString()}`} 
-            textColor={remainingBudget < 0 ? 'text-red-400' : 'text-green-400'} 
-          />
-        </div>
-        
-        {/* Usage Progress Bar */}
-        <div className="mb-1 flex justify-between text-xs">
-          <span>Budget Usage</span>
-          <span>{budgetUsagePercentage}%</span>
-        </div>
-        <div className="h-2 w-full bg-slate-600 rounded-full overflow-hidden">
-          <div 
-            className={budgetUsagePercentage > 80 ? 'bg-red-500' : 'bg-blue-500'}
-            style={{ width: `${budgetUsagePercentage}%`, height: '100%' }}
-          ></div>
-        </div>
-      </div>
       
 
       <button 

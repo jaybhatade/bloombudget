@@ -37,7 +37,7 @@ function Head() {
   }, [userID]);
   
   return (
-    <div className="w-full bg-slate-900  p-5 py-8 ">
+    <div className="w-full bg-slate-900  p-5 py-6 ">
       <div className="flex justify-between items-center w-full">
         <div className="flex items-center gap-3">
           <div>

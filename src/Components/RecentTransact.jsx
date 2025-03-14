@@ -58,7 +58,7 @@ function RecentTransact() {
         <div>
             {/* Recent Transactions */}
             <motion.div variants={cardVariants} className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 h-full p-6 rounded-xl shadow-lg">
-                <div className='flex justify-between items-center '>
+                <div className='flex justify-between items-center mb-4'>
                     <h2 className="text-lg font-semibold">Recent Transactions</h2>
                     <Link 
                         to="/transactions" 
