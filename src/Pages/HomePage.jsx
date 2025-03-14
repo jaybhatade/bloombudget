@@ -1,31 +1,22 @@
 import React from "react"
 import { useState, useEffect, Suspense }from "react"
 import { motion } from "framer-motion"
-import { FiPieChart, FiRefreshCw } from 'react-icons/fi'
 import Head from "../Components/Head"
 import Navbar from "../Components/Navbar"
 import RecentTransact from "../Components/RecentTransact"
 import BalanceCard from "../Components/BalanceCard"
-import ExpBreakdown from "../Components/ExpBreakdown"
 import BudgetCard from "../Components/BudgetCard"
 import InitialBalanceModal from "../SubComponents/InitialBalanceModal"
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../Firebase'
 
-// Lazy loading components that might not be immediately needed
-const ExpxInc = React.lazy(() => import("../Subpages/ExpxInc"))
-const IncBreakdown = React.lazy(() => import("../Components/IncBreakdown"))
+
 
 export default function HomePage() {
   const [showInitBalModal, setShowInitBalModal] = useState(false)
   const [loading, setLoading] = useState(true)
   const [hasAccounts, setHasAccounts] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -65,7 +56,6 @@ export default function HomePage() {
       console.error("Error checking user accounts:", error)
     } finally {
       setLoading(false)
-      setRefreshing(false)
     }
   }
   
@@ -76,11 +66,6 @@ export default function HomePage() {
   const handleModalComplete = () => {
     setHasAccounts(true)
     setShowInitBalModal(false)
-  }
-
-  const handleRefresh = () => {
-    setRefreshing(true)
-    checkUserAccounts()
   }
 
   return (
@@ -99,14 +84,7 @@ export default function HomePage() {
         <main className="p-4 pb-24 lg:pl-72">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Dashboard</h1>
-            <button 
-              onClick={handleRefresh} 
-              className="flex items-center px-3 py-1 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors"
-              disabled={refreshing}
-            >
-              <FiRefreshCw className={`mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
-            </button>
+
           </div>
           
           <motion.div
@@ -124,20 +102,8 @@ export default function HomePage() {
          
 
                 <BudgetCard />
-
-              <motion.div variants={cardVariants} className="col-span-1 lg:col-span-3">
-                <ExpBreakdown />
-              </motion.div>
-              
             </div>
             
-            {hasAccounts && (
-              <motion.div variants={cardVariants} className="mt-6">
-                  <Suspense fallback={<div className="h-64 flex items-center justify-center">Loading chart...</div>}>
-                    <ExpxInc />
-                  </Suspense>
-              </motion.div>
-            )}
           </motion.div>
         </main>
       )}

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../Firebase'
+import AccountBalanceCard from '../SubComponents/AccountBalanceCard'
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -88,58 +89,68 @@ function ProfilePage() {
 
       {/* Main Content - Added padding for desktop */}
       <div className="pb-24 lg:pl-64 flex flex-col justify-center w-full" >
+        <div className='pt-4 pl-4'>
+          <h2 className='text-2xl font-bold'>
+            Profile
+          </h2>
+        </div>
+        
         {/* User Profile Section */}
         <motion.div 
-          className="px-6 pt-8 pb-6 bg-slate-950"
+          className="px-6 pt-8 pb-4 bg-slate-950"
           initial={{ y: 50, opacity: 0 }} 
           animate={{ y: 0, opacity: 1 }} 
           transition={{ duration: 0.3 }}
         >
-          <div className="flex items-center">
+          <div className="flex items-center h-fit justify-start gap-4  ">
             <motion.div 
-              className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-2xl font-bold"
+              className="w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center text-2xl font-bold"
             >
               {getInitials(userData.name)}
             </motion.div>
-            <motion.div className="ml-4" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
+            <motion.div className="h-full " initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
               <h2 className="text-xl font-semibold">{userData.name}</h2>
-              <p className="text-slate-400">{userData.email}</p>
+              <p className="text-slate-400 text-sm">{userData.email}</p>
             </motion.div>
           </div>
         </motion.div>
 
-        {/* Premium Card - Made responsive */}
+        <div className='p-4'>
+
+        <AccountBalanceCard />
+        </div>
+        
+{/* 
         <motion.div 
           className="mx-4 my-6"
           initial={{ y: 50, opacity: 0 }} 
           animate={{ y: 0, opacity: 1 }} 
           transition={{ duration: 0.3 }}
         >
-          <motion.div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-2">Upgrade to Premium</h3>
-            <p className="text-slate-200 mb-4">Get detailed insights, advanced reports and more!</p>
-            <motion.button className="bg-white text-blue-600 px-6 py-2 rounded-lg font-medium hover:bg-slate-100 transition-colors" >
-              Upgrade Now
-            </motion.button>
+          <motion.div className="bg-blue-500 rounded-xl p-6">
+            <h3 className="text-lg font-bold mb-2">Get Premium now</h3>
+            <p className="text-slate-200">Get detailed insights, advanced reports and more!</p>
           </motion.div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Menu Items - Made responsive */}
-        <motion.div className="px-4 " initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
-          <div className="bg-slate-900 rounded-xl overflow-hidden">
+        <motion.div className="px-4 mt-2 " initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
+          <div className="bg-slate-800/70 rounded-xl overflow-hidden">
             {/* Rate App */}
-            <motion.button 
-              className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-800 hover:bg-slate-800 transition-colors" 
+            <motion.div 
+              className="w-full border-b border-slate-800 hover:bg-slate-800 transition-colors" 
               initial={{ x: -20, opacity: 0 }} 
               animate={{ x: 0, opacity: 1 }} 
-              transition={{ duration: 0.3, delay: 0.1 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
             >
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSfxdGGiP9IvxgLxZKAMhasPm1k3Kj7vmNmNy8PHKMJgzsDAdQ/viewform" target='_blank' className='flex items-center justify-between px-6 py-4 w-full'>
               <div className="flex items-center">
                 <FiStar className="text-yellow-500 w-6 h-6" />
                 <span className="ml-3">Rate the App</span>
               </div>
               <FiChevronRight className="text-slate-400" />
-            </motion.button>
+              </a>
+            </motion.div>
 
             <motion.div 
               className="w-full border-b border-slate-800 hover:bg-slate-800 transition-colors" 
@@ -185,7 +196,7 @@ function ProfilePage() {
             </motion.button>
 
             {/* Settings option */}
-            <motion.button 
+            {/* <motion.button 
               className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-800 hover:bg-slate-800 transition-colors" 
               initial={{ x: -20, opacity: 0 }} 
               animate={{ x: 0, opacity: 1 }} 
@@ -196,7 +207,7 @@ function ProfilePage() {
                 <span className="ml-3">Settings</span>
               </div>
               <FiChevronRight className="text-slate-400" />
-            </motion.button>
+            </motion.button> */}
 
             {/* Logout */}
             <motion.button 
