@@ -138,13 +138,38 @@ function BudgetCard() {
     );
   }
 
+  // Create a Set of budget category names for filtering
+  const budgetCategories = new Set();
+  budgets.forEach(budget => {
+    if (budget.categoryName) {
+      budgetCategories.add(budget.categoryName.toLowerCase().trim());
+    }
+    if (budget.category) {
+      budgetCategories.add(budget.category.toLowerCase().trim());
+    }
+  });
+
+  // Filter transactions that belong to budget categories
+  const budgetTransactions = transactions.filter(t => {
+    // Basic expense transaction check
+    if (t.type !== "expense" || !t.amount || typeof t.amount !== 'number') {
+      return false;
+    }
+    
+    // Check if transaction category is in our budget categories set
+    if (t.category) {
+      const normalizedCategory = t.category.toLowerCase().trim();
+      return budgetCategories.has(normalizedCategory);
+    }
+    
+    return false;
+  });
+
   // Calculate totals for all budgets
   const totalBudget = budgets.reduce((sum, budget) => sum + (budget.amount || 0), 0);
   
-  // Calculate total spent from all expense transactions
-  const totalSpent = transactions
-    .filter(t => t.type === "expense" && t.amount && typeof t.amount === 'number')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  // Calculate total spent from filtered transactions
+  const totalSpent = budgetTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
   
   const remainingBudget = totalBudget - totalSpent;
   const budgetUsagePercentage = totalBudget > 0 
@@ -210,7 +235,7 @@ function BudgetCard() {
         </div>
         
         <div className="text-xs text-slate-400 mt-3">
-          Based on {transactions.length} transactions across {budgets.length} budget categories
+          Based on {budgetTransactions.length} transactions across {budgets.length} budget categories
         </div>
         </Link>
       </div>

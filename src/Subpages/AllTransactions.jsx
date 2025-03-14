@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../Firebase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiFilter, FiArrowLeft, FiEdit, FiTrash2, FiX } from 'react-icons/fi';
+import { TransactionService } from '../Common/Transactions/TransactionService';
+import { TransactionUtils } from '../Common/Transactions/TransactionUtils';
 
 function AllTransactions() {
     const [transactions, setTransactions] = useState([]);
@@ -43,6 +43,11 @@ function AllTransactions() {
         fetchTransactions();
     }, []);
 
+    useEffect(() => {
+        const filtered = TransactionUtils.filterTransactions(transactions, filterType, searchTerm);
+        setFilteredTransactions(filtered);
+    }, [transactions, filterType, searchTerm]);
+
     const fetchTransactions = async () => {
         try {
             setLoading(true);
@@ -52,24 +57,7 @@ function AllTransactions() {
                 return;
             }
 
-            const q = query(
-                collection(db, 'transactions'),
-                where('userID', '==', userID)
-            );
-
-            const querySnapshot = await getDocs(q);
-            const transactionsData = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-
-            // Sort by date (newest first)
-            transactionsData.sort((a, b) => {
-                const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
-                const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-                return dateB - dateA;
-            });
-
+            const transactionsData = await TransactionService.fetchAllTransactions(userID);
             setTransactions(transactionsData);
             setFilteredTransactions(transactionsData);
             setError(null);
@@ -89,70 +77,14 @@ function AllTransactions() {
         try {
             setLoadingCategories(true);
             const userID = localStorage.getItem('userID');
-            
-            // Create a query to fetch default categories (userID === 'default')
-            const defaultQuery = query(
-                collection(db, 'categories'),
-                where('userID', '==', 'default')
-            );
-            
-            // Create a query to fetch user's custom categories
-            const userQuery = query(
-                collection(db, 'categories'),
-                where('userID', '==', userID)
-            );
-            
-            // Execute both queries
-            const [defaultSnapshot, userSnapshot] = await Promise.all([
-                getDocs(defaultQuery),
-                getDocs(userQuery)
-            ]);
-            
-            // Combine results
-            const defaultCategories = defaultSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            
-            const userCategories = userSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            
-            // Merge categories, with user categories taking precedence if there are duplicates
-            const allCategories = [...defaultCategories, ...userCategories];
-            
-            // Sort alphabetically by name
-            allCategories.sort((a, b) => a.name.localeCompare(b.name));
-            
-            setCategories(allCategories);
+            const categoriesData = await TransactionService.fetchCategories(userID);
+            setCategories(categoriesData);
         } catch (error) {
             console.error('Error fetching categories:', error);
         } finally {
             setLoadingCategories(false);
         }
     };
-
-    // Filter and search logic
-    useEffect(() => {
-        let results = [...transactions];
-        
-        // Apply type filter
-        if (filterType !== 'all') {
-            results = results.filter(transaction => transaction.type === filterType);
-        }
-        
-        // Apply search term
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase();
-            results = results.filter(transaction => 
-                (transaction.categoryName && transaction.categoryName.toLowerCase().includes(term)) ||
-                (transaction.notes && transaction.notes.toLowerCase().includes(term))
-            );
-        }
-        
-        setFilteredTransactions(results);
-    }, [transactions, filterType, searchTerm]);
 
     const handleBackClick = () => {
         navigate(-1);
@@ -187,7 +119,10 @@ function AllTransactions() {
 
     const handleDeleteConfirm = async () => {
         try {
-            await deleteDoc(doc(db, 'transactions', selectedTransaction.id));
+            await TransactionService.deleteTransaction(
+                selectedTransaction.id, 
+                selectedTransaction.transactionType
+            );
             // Update local state
             const updatedTransactions = transactions.filter(t => t.id !== selectedTransaction.id);
             setTransactions(updatedTransactions);
@@ -222,31 +157,27 @@ function AllTransactions() {
 
     const handleSaveEdit = async () => {
         try {
-            const transactionRef = doc(db, 'transactions', selectedTransaction.id);
-            
-            // Format date properly if it's a Date object
-            let updatedTransaction = {...editedTransaction};
-            
-            await updateDoc(transactionRef, updatedTransaction);
+            if (editedTransaction.transactionType === 'transfer') {
+                // For transfer transactions, only allow updating notes for simplicity
+                const updateData = { notes: editedTransaction.notes };
+                await TransactionService.updateTransferTransaction(editedTransaction.id, updateData);
+            } else {
+                // For regular transactions, allow updating all fields
+                await TransactionService.updateRegularTransaction(editedTransaction.id, editedTransaction);
+            }
             
             // Update local state
             const updatedTransactions = transactions.map(t => 
-                t.id === selectedTransaction.id ? {...t, ...updatedTransaction} : t
+                t.id === selectedTransaction.id ? {...t, ...editedTransaction} : t
             );
             
             setTransactions(updatedTransactions);
-            setSelectedTransaction({...selectedTransaction, ...updatedTransaction});
+            setSelectedTransaction({...selectedTransaction, ...editedTransaction});
             setEditMode(false);
         } catch (error) {
             console.error('Error updating transaction:', error);
             setError('Failed to update transaction: ' + error.message);
         }
-    };
-
-    const formatDate = (date) => {
-        if (!date) return '';
-        const d = date?.toDate ? date.toDate() : new Date(date);
-        return d.toISOString().split('T')[0]; // YYYY-MM-DD format for input
     };
 
     return (
@@ -277,7 +208,7 @@ function AllTransactions() {
                         <FiSearch size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
                         <input
                             type="text"
-                            placeholder="Search by category or notes..."
+                            placeholder="Search by name, account, or notes..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full bg-slate-800 rounded-lg py-2 pl-10 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -317,6 +248,12 @@ function AllTransactions() {
                                 className={`px-4 py-2 rounded-lg ${filterType === 'expense' ? 'bg-red-600' : 'bg-slate-700'} hover:bg-red-500 transition-colors`}
                             >
                                 Expense
+                            </button>
+                            <button
+                                onClick={() => setFilterType('transfer')}
+                                className={`px-4 py-2 rounded-lg ${filterType === 'transfer' ? 'bg-blue-600' : 'bg-slate-700'} hover:bg-blue-500 transition-colors`}
+                            >
+                                Transfer
                             </button>
                         </div>
                     </motion.div>
@@ -364,21 +301,19 @@ function AllTransactions() {
                                 >
                                     <div className="flex items-center">
                                         <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center mr-3">
-                                            <span>{transaction.categoryIcon || '💰'}</span>
+                                            <span>{TransactionUtils.getTransactionIcon(transaction)}</span>
                                         </div>
                                         <div>
-                                            <p className="font-medium">{transaction.categoryName}</p>
+                                            <p className="font-medium">{TransactionUtils.getTransactionName(transaction)}</p>
                                             <p className="text-slate-400 text-sm">
-                                                {transaction.date?.toDate ? 
-                                                    new Date(transaction.date.toDate()).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 
-                                                    new Date(transaction.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                                {TransactionUtils.formatDisplayDate(transaction.date)}
                                             </p>
                                             <p className="font-medium text-slate-400 truncate text-xs max-w-xs">{transaction.notes}</p>
                                         </div>
                                     </div>
-                                    <p className={transaction.type === "income" ? "text-green-400 font-medium" : "text-red-400 font-medium"}>
-                                        {transaction.type === "income" ? "+" : "-"}
-                                        ₹{transaction.amount.toLocaleString()}
+                                    <p className={TransactionUtils.getAmountColorClass(transaction)}>
+                                        {TransactionUtils.getAmountPrefix(transaction)}
+                                        ₹{TransactionUtils.getTransactionAmount(transaction).toLocaleString()}
                                     </p>
                                 </li>
                             ))}
@@ -450,75 +385,106 @@ function AllTransactions() {
                                     </div>
                                 </div>
                             ) : editMode ? (
-                                /* Edit Mode */
+                                /* Edit Mode - different for regular vs. transfer transactions */
                                 <div className="p-6 space-y-4">
-                                    <div>
-                                        <label className="block text-sm text-slate-400 mb-1">Transaction Type</label>
-                                        <select
-                                            name="type"
-                                            value={editedTransaction.type || ''}
-                                            onChange={handleInputChange}
-                                            className="w-full bg-slate-700 rounded-lg p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        >
-                                            <option value="income">Income</option>
-                                            <option value="expense">Expense</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm text-slate-400 mb-1">Amount (₹)</label>
-                                        <input
-                                            type="number"
-                                            name="amount"
-                                            value={editedTransaction.amount || ''}
-                                            onChange={handleInputChange}
-                                            className="w-full bg-slate-700 rounded-lg p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm text-slate-400 mb-1">Category</label>
-                                        {loadingCategories ? (
-                                            <div className="flex items-center space-x-2 text-slate-400">
-                                                <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-                                                <span>Loading categories...</span>
+                                    {selectedTransaction.transactionType === 'regular' ? (
+                                        /* Regular Transaction Edit Form */
+                                        <>
+                                            <div>
+                                                <label className="block text-sm text-slate-400 mb-1">Transaction Type</label>
+                                                <select
+                                                    name="type"
+                                                    value={editedTransaction.type || ''}
+                                                    onChange={handleInputChange}
+                                                    className="w-full bg-slate-700 rounded-lg p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                >
+                                                    <option value="income">Income</option>
+                                                    <option value="expense">Expense</option>
+                                                </select>
                                             </div>
-                                        ) : (
-                                            <select
-                                                value={editedTransaction.categoryId || ''}
-                                                onChange={handleCategoryChange}
-                                                className="w-full bg-slate-700 rounded-lg p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            >
-                                                <option value="">Select a category</option>
-                                                {categories
-                                                    .filter(cat => cat.type === editedTransaction.type) // Only show categories matching the transaction type
-                                                    .map(category => (
-                                                        <option key={category.id} value={category.id}>
-                                                            {category.icon} {category.name}
-                                                        </option>
-                                                    ))
-                                                }
-                                            </select>
-                                        )}
-                                    </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm text-slate-400 mb-1">Amount (₹)</label>
+                                                <input
+                                                    type="number"
+                                                    name="amount"
+                                                    value={editedTransaction.amount || ''}
+                                                    onChange={handleInputChange}
+                                                    className="w-full bg-slate-700 rounded-lg p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm text-slate-400 mb-1">Category</label>
+                                                {loadingCategories ? (
+                                                    <div className="flex items-center space-x-2 text-slate-400">
+                                                        <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                                                        <span>Loading categories...</span>
+                                                    </div>
+                                                ) : (
+                                                    <select
+                                                        value={editedTransaction.categoryId || ''}
+                                                        onChange={handleCategoryChange}
+                                                        className="w-full bg-slate-700 rounded-lg p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    >
+                                                        <option value="">Select a category</option>
+                                                        {categories
+                                                            .filter(cat => cat.type === editedTransaction.type) // Only show categories matching the transaction type
+                                                            .map(category => (
+                                                                <option key={category.id} value={category.id}>
+                                                                    {category.icon} {category.name}
+                                                                </option>
+                                                            ))
+                                                        }
+                                                    </select>
+                                                )}
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm text-slate-400 mb-1">Date</label>
+                                                <input
+                                                    type="date"
+                                                    name="date"
+                                                    value={TransactionUtils.formatDate(editedTransaction.date)}
+                                                    onChange={(e) => {
+                                                        const date = new Date(e.target.value);
+                                                        setEditedTransaction({
+                                                            ...editedTransaction,
+                                                            date: date
+                                                        });
+                                                    }}
+                                                    className="w-full bg-slate-700 rounded-lg p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        /* Transfer Transaction Edit Form - Limited to just notes */
+                                        <div className="space-y-4">
+                                            <div className="bg-slate-700 rounded-lg p-4">
+                                                <p className="text-yellow-400 mb-2">Note: Transfer transaction details like accounts and amount cannot be edited</p>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <p className="text-sm text-slate-400">From Account</p>
+                                                        <p className="font-medium">{editedTransaction.sourceAccountName}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-slate-400">To Account</p>
+                                                        <p className="font-medium">{editedTransaction.destinationAccountName}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-slate-400">Amount</p>
+                                                        <p className="font-medium">₹{editedTransaction.amount.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-slate-400">Date</p>
+                                                        <p className="font-medium">{TransactionUtils.formatDisplayDate(editedTransaction.date)}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                     
-                                    <div>
-                                        <label className="block text-sm text-slate-400 mb-1">Date</label>
-                                        <input
-                                            type="date"
-                                            name="date"
-                                            value={formatDate(editedTransaction.date)}
-                                            onChange={(e) => {
-                                                const date = new Date(e.target.value);
-                                                setEditedTransaction({
-                                                    ...editedTransaction,
-                                                    date: date
-                                                });
-                                            }}
-                                            className="w-full bg-slate-700 rounded-lg p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-                                    
+                                    {/* Common fields for both transaction types */}
                                     <div>
                                         <label className="block text-sm text-slate-400 mb-1">Notes</label>
                                         <textarea
@@ -545,52 +511,110 @@ function AllTransactions() {
                                     </div>
                                 </div>
                             ) : (
-                                /* View Mode */
+                                /* View Mode - different for regular vs. transfer transactions */
                                 <div className="p-6">
                                     <div className="flex items-center justify-center mb-6">
                                         <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center">
-                                            <span className="text-2xl">{selectedTransaction.categoryIcon || '💰'}</span>
+                                            <span className="text-2xl">
+                                                {TransactionUtils.getTransactionIcon(selectedTransaction)}
+                                            </span>
                                         </div>
                                     </div>
                                     
-                                    <div className="space-y-4">
-                                        <div className="text-center">
-                                            <h4 className="text-2xl font-bold mb-1">
-                                                <span className={selectedTransaction.type === "income" ? "text-green-400" : "text-red-400"}>
-                                                    {selectedTransaction.type === "income" ? "+" : "-"}
-                                                    ₹{selectedTransaction.amount.toLocaleString()}
-                                                </span>
-                                            </h4>
-                                            <p className="text-slate-400">{selectedTransaction.categoryName}</p>
-                                        </div>
-                                        
-                                        <div className="bg-slate-700 rounded-lg p-4 space-y-3">
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-400">Date</span>
-                                                <span>
-                                                    {selectedTransaction.date?.toDate ? 
-                                                        new Date(selectedTransaction.date.toDate()).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 
-                                                        new Date(selectedTransaction.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                                                </span>
+                                    {selectedTransaction.transactionType === 'regular' ? (
+                                        /* Regular Transaction Details */
+                                        <div className="space-y-4">
+                                            <div className="text-center">
+                                                <h4 className="text-2xl font-bold mb-1">
+                                                    <span className={selectedTransaction.type === "income" ? "text-green-400" : "text-red-400"}>
+                                                        {selectedTransaction.type === "income" ? "+" : "-"}
+                                                        ₹{selectedTransaction.amount.toLocaleString()}
+                                                    </span>
+                                                </h4>
+                                                <p className="text-slate-400">{selectedTransaction.categoryName}</p>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-400">Type</span>
-                                                <span className={selectedTransaction.type === "income" ? "text-green-400 capitalize" : "text-red-400 capitalize"}>
-                                                    {selectedTransaction.type}
-                                                </span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-400">Category</span>
-                                                <span>{selectedTransaction.categoryName}</span>
-                                            </div>
-                                            {selectedTransaction.notes && (
-                                                <div>
-                                                    <span className="text-slate-400 block mb-1">Notes</span>
-                                                    <p className="bg-slate-800 p-3 rounded">{selectedTransaction.notes}</p>
+                                            
+                                            <div className="bg-slate-700 rounded-lg p-4 space-y-3">
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-400">Date</span>
+                                                    <span>{TransactionUtils.formatDisplayDate(selectedTransaction.date)}</span>
                                                 </div>
-                                            )}
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-400">Type</span>
+                                                    <span className={selectedTransaction.type === "income" ? "text-green-400 capitalize" : "text-red-400 capitalize"}>
+                                                        {selectedTransaction.type}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-400">Category</span>
+                                                    <span>{selectedTransaction.categoryName}</span>
+                                                </div>
+                                                {selectedTransaction.notes && (
+                                                    <div>
+                                                        <span className="text-slate-400 block mb-1">Notes</span>
+                                                        <p className="bg-slate-800 p-3 rounded">{selectedTransaction.notes}</p>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        /* Transfer Transaction Details */
+                                        <div className="space-y-4">
+                                            <div className="text-center">
+                                                <h4 className="text-2xl font-bold mb-1">
+                                                    <span className="text-blue-400">
+                                                        ₹{selectedTransaction.amount.toLocaleString()}
+                                                    </span>
+                                                </h4>
+                                                <p className="text-slate-400">Transfer</p>
+                                            </div>
+                                            
+                                            <div className="bg-slate-700 rounded-lg p-4 space-y-3">
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-400">Date</span>
+                                                    <span>{TransactionUtils.formatDisplayDate(selectedTransaction.date)}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-slate-400 block mb-1">From Account</span>
+                                                    <div className="flex items-center space-x-2 bg-slate-800 p-3 rounded">
+                                                        <span>{selectedTransaction.sourceAccountIcon}</span>
+                                                        <span>{selectedTransaction.sourceAccountName}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-slate-400 block mb-1">To Account</span>
+                                                    <div className="flex items-center space-x-2 bg-slate-800 p-3 rounded">
+                                                        <span>{selectedTransaction.destinationAccountIcon}</span>
+                                                        <span>{selectedTransaction.destinationAccountName}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <span className="text-slate-400 block mb-1">Source Balance Before</span>
+                                                        <p className="bg-slate-800 p-2 rounded">₹{selectedTransaction.sourceBalanceBefore.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-slate-400 block mb-1">Source Balance After</span>
+                                                        <p className="bg-slate-800 p-2 rounded">₹{selectedTransaction.sourceBalanceAfter.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-slate-400 block mb-1">Dest. Balance Before</span>
+                                                        <p className="bg-slate-800 p-2 rounded">₹{selectedTransaction.destinationBalanceBefore.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-slate-400 block mb-1">Dest. Balance After</span>
+                                                        <p className="bg-slate-800 p-2 rounded">₹{selectedTransaction.destinationBalanceAfter.toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+                                                {selectedTransaction.notes && (
+                                                    <div>
+                                                        <span className="text-slate-400 block mb-1">Notes</span>
+                                                        <p className="bg-slate-800 p-3 rounded">{selectedTransaction.notes}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </motion.div>

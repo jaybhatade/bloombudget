@@ -7,6 +7,33 @@
       "role": "User"                       // string
     }
   },
+
+
+{
+  "TransferTransactions": {
+    "xbKu1ERkaJz97zJkpiWn": {
+      "amount": 500,
+      "createdAt": "2025-03-14T22:11:42+05:30",
+      "date": "2025-03-14T22:11:13+05:30",
+      "destinationAccountIcon": "💵",
+      "destinationAccountId": "hdPOnVf10LRSBleR99oY",
+      "destinationAccountName": "Cash",
+      "destinationBalanceAfter": 600,
+      "destinationBalanceBefore": 100,
+      "notes": "",
+      "sourceAccountIcon": "🏦",
+      "sourceAccountId": "WDYDSAa6BfBwCbsfXmtx",
+      "sourceAccountName": "Kotak",
+      "sourceBalanceAfter": 0,
+      "sourceBalanceBefore": 500,
+      "userID": "0UMp7oaQOGkjKgDF6rcM"
+    }
+  }
+}
+
+
+
+
   "transactions": {                        // Collection
     "qZ57jsoXPnknyzSZxrdr": {              // Document
       "amount": 100,                       // number

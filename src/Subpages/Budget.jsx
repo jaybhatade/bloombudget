@@ -41,7 +41,7 @@ const BudgetCard = ({ budget, onEdit, onDelete, spent, transactionCount }) => {
 
 // Stats Card Component
 const StatsCard = ({ title, value, textColor = "text-white" }) => (
-  <div className="bg-slate-700/50 p-3 rounded-lg">
+  <div className=" ">
     <div className="text-slate-300 text-sm mb-1">{title}</div>
     <div className={`text-lg font-bold ${textColor}`}>{value}</div>
   </div>
@@ -329,10 +329,36 @@ function Budget() {
   };
   
   // Calculate totals
+  const budgetCategories = new Set();
+  budgets.forEach(budget => {
+    if (budget.categoryName) {
+      budgetCategories.add(budget.categoryName.toLowerCase().trim());
+    }
+    if (budget.category) {
+      budgetCategories.add(budget.category.toLowerCase().trim());
+    }
+  });
+
   const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
   const totalSpent = transactions
-    .filter(t => t.type === "expense" && t.amount && typeof t.amount === 'number')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  .filter(t => {
+    // Basic expense transaction check
+    if (t.type !== "expense" || !t.amount || typeof t.amount !== 'number') {
+      return false;
+    }
+    
+    // Check if transaction category is in our budget categories set
+    if (t.category) {
+      const normalizedCategory = t.category.toLowerCase().trim();
+      return budgetCategories.has(normalizedCategory);
+    }
+    
+    return false;
+  })
+  .reduce((sum, transaction) => sum + transaction.amount, 0);
+  
+
+
   const remainingBudget = totalBudget - totalSpent;
   const budgetUsagePercentage = totalBudget > 0 
     ? Math.min(Math.round((totalSpent / totalBudget) * 100), 100) 
@@ -380,13 +406,7 @@ function Budget() {
           <h1 className="text-xl font-bold">Budget Dashboard</h1>
         </div>
         
-        <button 
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm"
-        >
-          {showForm ? <FiX className="mr-1" /> : <FiPlus className="mr-1" />}
-          {showForm ? 'Cancel' : 'Add Budget'}
-        </button>
+
       </div>
 
       {/* Budget Form */}
@@ -405,7 +425,7 @@ function Budget() {
       <div className="bg-slate-800/50 p-4 rounded-lg mb-4">
         <h2 className="text-lg font-semibold mb-3">Overview</h2>
         
-        <div className="grid grid-cols-3 gap-3 mb-3">
+        <div className="flex justify-between pb-6 pt-4">
           <StatsCard title="Total Budget" value={`₹${totalBudget.toLocaleString()}`} />
           <StatsCard title="Total Spent" value={`₹${totalSpent.toLocaleString()}`} textColor="text-red-400" />
           <StatsCard 
@@ -428,6 +448,15 @@ function Budget() {
         </div>
       </div>
       
+
+      <button 
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center justify-center w-full mb-4 bg-blue-500 hover:bg-blue-600 text-white px-3 py-3 rounded-lg text-md"
+        >
+          {showForm ? <FiX className="mr-1" /> : <FiPlus className="mr-1" />}
+          {showForm ? 'Cancel' : 'Add Budget'}
+        </button>
+
       {/* Budgets by Category */}
       <div className="bg-slate-800/50 p-4 rounded-lg">
         <h2 className="text-lg font-semibold mb-3">Budget Categories</h2>
@@ -435,12 +464,10 @@ function Budget() {
         {Object.keys(budgetsByCategory).length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {Object.entries(budgetsByCategory).map(([categoryName, categoryBudgets]) => {
-              const totalCategoryBudget = categoryBudgets.reduce((sum, b) => sum + b.amount, 0);
-              const spent = calculateSpentByCategory(categoryName);
-              const transactionCount = getTransactionCountByCategory(categoryName);
+
               
               return (
-                <div key={categoryName} className="bg-slate-700/40 p-3 rounded-lg">
+                <div key={categoryName} className="">
                   
                   {/* Category Budgets */}
                   <div className="space-y-2">
