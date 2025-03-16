@@ -36,7 +36,9 @@ function AiPage() {
           return;
         }
 
-        // 1. Fetch user profile information directly using document reference
+
+
+        // 1. Fetch user profile information
         const userDocRef = doc(db, "users", userID);
         const userDocSnap = await getDoc(userDocRef);
         let userName = "User";
@@ -47,67 +49,89 @@ function AiPage() {
           }
         }
 
-        // 1. Fetch transactions
-        const transactionsQuery = query(
-          collection(db, 'transactions'),
-          where('userID', '==', userID)
-        );
-        const transactionsSnapshot = await getDocs(transactionsQuery);
-        const fetchedTransactions = [];
-        transactionsSnapshot.forEach((doc) => {
-          fetchedTransactions.push({
-            id: doc.id,
-            ...doc.data()
-          });
-        });
-        setTransactions(fetchedTransactions);
-
-        // 2. Fetch accounts for total balance
+        // 2. Fetch all user accounts
         const accountsQuery = query(
           collection(db, 'accounts'),
           where('userID', '==', userID)
         );
         const accountsSnapshot = await getDocs(accountsQuery);
         let accountsBalance = 0;
+        const accounts = [];
+        
         accountsSnapshot.forEach((doc) => {
           const accountData = doc.data();
+          accounts.push({
+            id: doc.id,
+            ...accountData
+          });
           if (accountData.balance) {
             accountsBalance += accountData.balance;
           }
         });
+        
         setTotalBalance(accountsBalance);
 
-        // Calculate monthly income and expenses
-        calculateMonthlyTransactions(fetchedTransactions);
-
-        // Fetch savings goals if they exist
-        const goalsQuery = query(
-          collection(db, 'goals'),
+        // 3. Fetch all user transactions
+        const transactionsQuery = query(
+          collection(db, 'transactions'),
           where('userID', '==', userID)
         );
-        const goalsSnapshot = await getDocs(goalsQuery);
-        let savingsGoal = 0;
-        if (!goalsSnapshot.empty) {
-          const goalData = goalsSnapshot.docs[0].data();
-          if (goalData.targetAmount) {
-            savingsGoal = goalData.targetAmount;
-          }
-        }
+        const transactionsSnapshot = await getDocs(transactionsQuery);
+        const fetchedTransactions = [];
+        
+        transactionsSnapshot.forEach((doc) => {
+          fetchedTransactions.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+        
+        setTransactions(fetchedTransactions);
 
-        // Build expense categories breakdown
+        // 4. Fetch user budgets
+        const budgetsQuery = query(
+          collection(db, 'budgets'),
+          where('userID', '==', userID)
+        );
+        const budgetsSnapshot = await getDocs(budgetsQuery);
+        const budgets = [];
+        
+        budgetsSnapshot.forEach((doc) => {
+          budgets.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+        
+        
+        // Calculate monthly totals
+        const monthlyData = calculateMonthlyTransactions(fetchedTransactions);
+        
+        // Set income and expenses state
+        setTotalIncome(monthlyData.monthlyIncome);
+        setTotalExpenses(monthlyData.monthlyExpenses);
+
+        // Calculate expense categories breakdown
         const expenseCategories = getExpenseCategoriesBreakdown(fetchedTransactions);
 
-        // Set complete user data
-        setUserData({
-          name: userName,
-          totalIncome: totalIncome,
-          totalExpenses: totalExpenses,
-          budget: getBudgetEstimate(fetchedTransactions),
-          expenseCategories: expenseCategories,
-          savingsGoal: savingsGoal,
-          balance: accountsBalance
-        });
+        // Calculate budget estimate
+        const budgetEstimate = getBudgetEstimate(fetchedTransactions);
 
+        // Set complete user data
+        const completeUserData = {
+          name: userName,
+          totalIncome: monthlyData.monthlyIncome,
+          totalExpenses: monthlyData.monthlyExpenses,
+          budget: budgetEstimate,
+          expenseCategories: expenseCategories,
+          balance: accountsBalance,
+          accounts: accounts,
+          budgets: budgets
+        };
+        
+        setUserData(completeUserData);
+
+        
         setDataLoading(false);
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -121,7 +145,9 @@ function AiPage() {
   // Calculate monthly transactions whenever month/year changes or transactions are fetched
   useEffect(() => {
     if (transactions.length > 0) {
-      calculateMonthlyTransactions(transactions);
+      const monthlyData = calculateMonthlyTransactions(transactions);
+      setTotalIncome(monthlyData.monthlyIncome);
+      setTotalExpenses(monthlyData.monthlyExpenses);
     }
   }, [currentMonthIndex, currentYear, transactions]);
 
@@ -131,17 +157,17 @@ function AiPage() {
     let monthlyExpenses = 0;
 
     transactionsData.forEach(transaction => {
-      // Handle different date formats
+      // Parse date from transaction
       let transactionDate;
-      if (transaction.date && transaction.date.toDate) {
-        // If using Firestore Timestamp
-        transactionDate = transaction.date.toDate();
-      } else if (transaction.date instanceof Date) {
-        // If already a Date object
-        transactionDate = transaction.date;
-      } else if (typeof transaction.date === 'string') {
-        // If date string
-        transactionDate = new Date(transaction.date);
+      if (transaction.date) {
+        if (transaction.date.toDate) {
+          // Handle Firestore Timestamp
+          transactionDate = transaction.date.toDate();
+        } else if (transaction.date instanceof Date) {
+          transactionDate = transaction.date;
+        } else if (typeof transaction.date === 'string') {
+          transactionDate = new Date(transaction.date);
+        }
       }
       
       // Check if transaction is from selected month and year
@@ -151,14 +177,13 @@ function AiPage() {
         
         if (transaction.type === 'income') {
           monthlyIncome += transaction.amount;
-        } else {
+        } else if (transaction.type === 'expense') {
           monthlyExpenses += transaction.amount;
         }
       }
     });
 
-    setTotalIncome(monthlyIncome);
-    setTotalExpenses(monthlyExpenses);
+    return { monthlyIncome, monthlyExpenses };
   };
 
   // Function to get expense categories breakdown
@@ -166,26 +191,29 @@ function AiPage() {
     const categories = {};
     
     transactionsData.forEach(transaction => {
-      // Only consider expense transactions from current month/year
+      // Parse date from transaction
       let transactionDate;
-      if (transaction.date && transaction.date.toDate) {
-        transactionDate = transaction.date.toDate();
-      } else if (transaction.date instanceof Date) {
-        transactionDate = transaction.date;
-      } else if (typeof transaction.date === 'string') {
-        transactionDate = new Date(transaction.date);
+      if (transaction.date) {
+        if (transaction.date.toDate) {
+          transactionDate = transaction.date.toDate();
+        } else if (transaction.date instanceof Date) {
+          transactionDate = transaction.date;
+        } else if (typeof transaction.date === 'string') {
+          transactionDate = new Date(transaction.date);
+        }
       }
       
+      // Only consider expense transactions from current month/year
       if (transaction.type === 'expense' && 
           transactionDate && 
           transactionDate.getMonth() === currentMonthIndex && 
           transactionDate.getFullYear() === currentYear) {
         
-        const category = transaction.category || 'other';
-        if (!categories[category]) {
-          categories[category] = 0;
+        const categoryName = transaction.categoryName || 'Other';
+        if (!categories[categoryName]) {
+          categories[categoryName] = 0;
         }
-        categories[category] += transaction.amount;
+        categories[categoryName] += transaction.amount;
       }
     });
     
@@ -206,12 +234,14 @@ function AiPage() {
       let monthlyTotal = 0;
       transactionsData.forEach(transaction => {
         let transactionDate;
-        if (transaction.date && transaction.date.toDate) {
-          transactionDate = transaction.date.toDate();
-        } else if (transaction.date instanceof Date) {
-          transactionDate = transaction.date;
-        } else if (typeof transaction.date === 'string') {
-          transactionDate = new Date(transaction.date);
+        if (transaction.date) {
+          if (transaction.date.toDate) {
+            transactionDate = transaction.date.toDate();
+          } else if (transaction.date instanceof Date) {
+            transactionDate = transaction.date;
+          } else if (typeof transaction.date === 'string') {
+            transactionDate = new Date(transaction.date);
+          }
         }
         
         if (transaction.type === 'expense' && 
@@ -228,7 +258,7 @@ function AiPage() {
       }
     }
     
-    return monthsCount > 0 ? Math.round(totalExpenses / monthsCount) : totalExpenses;
+    return monthsCount > 0 ? Math.round(totalExpenses / monthsCount) : 0;
   };
 
   // Initialize Google AI API
@@ -296,11 +326,6 @@ function AiPage() {
       categoryBreakdown += `- ${category}: ${INR}${amount.toLocaleString()}\n`;
     });
 
-    // Calculate savings rate
-    const savingsRate = userData.totalIncome > 0 
-      ? Math.round(((userData.totalIncome - userData.totalExpenses) / userData.totalIncome) * 100) 
-      : 0;
-
     // Format transactions for recent history
     let recentTransactions = "";
     const sortedTransactions = [...transactions]
@@ -315,8 +340,23 @@ function AiPage() {
       const date = transaction.date && transaction.date.toDate 
         ? transaction.date.toDate().toLocaleDateString() 
         : new Date(transaction.date).toLocaleDateString();
-      recentTransactions += `- ${date}: ${transaction.description || 'Transaction'} (${transaction.type}): ${INR}${transaction.amount.toLocaleString()}\n`;
+      recentTransactions += `- ${date}: ${transaction.categoryName || 'Other'} (${transaction.type}): ${INR}${transaction.amount.toLocaleString()}\n`;
     });
+
+    // Get active budget information
+    let budgetInfo = "";
+    if (userData.budgets && userData.budgets.length > 0) {
+      const currentMonthBudgets = userData.budgets.filter(budget => 
+        budget.month === currentMonthName
+      );
+      
+      if (currentMonthBudgets.length > 0) {
+        budgetInfo = "Active Budgets:\n";
+        currentMonthBudgets.forEach(budget => {
+          budgetInfo += `- ${budget.categoryName}: ${INR}${budget.amount.toLocaleString()}\n`;
+        });
+      }
+    }
 
     return `
       User Data Context for ${currentMonthName} ${currentYear}:
@@ -324,16 +364,15 @@ function AiPage() {
       Account Balance: ${INR}${userData.balance.toLocaleString()}
       Total Income this month: ${INR}${userData.totalIncome.toLocaleString()}
       Total Expenses this month: ${INR}${userData.totalExpenses.toLocaleString()}
-      Monthly Budget: ${INR}${userData.budget.toLocaleString()}
-      Current Savings Rate: ${savingsRate}%
+      Monthly Budget Estimate: ${INR}${userData.budget.toLocaleString()}
       
       Top Expense Categories:
       ${categoryBreakdown}
       
+      ${budgetInfo}
+      
       Recent Transactions:
       ${recentTransactions}
-      
-      Savings Goal: ${INR}${userData.savingsGoal.toLocaleString()}
 
       User Question: ${userQuestion}
 
@@ -364,6 +403,8 @@ function AiPage() {
       const result = await model.generateContent(contextualPrompt);
       const response = result.response;
       const text = response.text();
+      
+
       
       // Add AI response to conversation
       setConversation(prev => [...prev, {

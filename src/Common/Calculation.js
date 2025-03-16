@@ -11,7 +11,6 @@ export const fetchTransactions = async (userID) => {
         id: doc.id,
         ...doc.data()
     }));
-    console.log('Fetched transactions:', transactions);
     return transactions;
 };
 
@@ -25,27 +24,23 @@ export const fetchAccounts = async (userID) => {
         id: doc.id,
         ...doc.data()
     }));
-    console.log('Fetched accounts:', accounts);
     return accounts;
 };
 
 export const calculateTotalIncome = (transactions) => {
     const incomeTransactions = transactions.filter(t => t.type === 'income');
     const totalIncome = incomeTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-    console.log('Calculated total income:', totalIncome);
     return totalIncome;
 };
 
 export const calculateTotalExpenses = (transactions) => {
     const expenseTransactions = transactions.filter(t => t.type === 'expense');
     const totalExpenses = expenseTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-    console.log('Calculated total expenses:', totalExpenses);
     return totalExpenses;
 };
 
 export const calculateNetSavings = (totalIncome, totalExpenses) => {
     const netSavings = totalIncome - totalExpenses;
-    console.log('Calculated net savings:', netSavings);
     return netSavings;
 };
 
@@ -54,13 +49,12 @@ export const calculateTotalBalance = (accounts) => {
         const balance = parseFloat(account.balance) || 0;
         return sum + balance;
     }, 0);
-    console.log('Calculated total balance:', totalBalance);
     return totalBalance;
 };
 
 export const calculateBalanceAfterTransactions = (totalBalance, netSavings) => {
     const newBalance = totalBalance + netSavings;
-    console.log('Calculated balance after transactions:', newBalance);
+
     return newBalance;
 };
 
