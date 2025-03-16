@@ -143,7 +143,7 @@ export default function HomePage() {
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
-        <main className="p-4 pb-24 lg:pl-72 bg-slate-950 ">
+        <main className="p-4 pb-24 lg:pl-72 bg-slate-950 min-h-[100dvh]">
          
           {renderTabContent()}
         </main>

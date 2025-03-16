@@ -4,7 +4,6 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import "react-circular-progressbar/dist/styles.css";
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../Firebase';
-import { Link } from 'react-router-dom';
 import { CiCirclePlus } from "react-icons/ci";
 
 function BudgetCard() {
@@ -125,7 +124,7 @@ function BudgetCard() {
         animate="visible"
         className="w-full h-full"
       >
-        <Link to="/budget" className="block h-full">
+        <div className="block h-full hidden">
           <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-4 rounded-lg h-full flex flex-col items-center justify-center">
             <CiCirclePlus size={48} className="text-blue-400 mb-3" />
             <div className="text-lg font-semibold text-white">Add Budget</div>
@@ -133,7 +132,7 @@ function BudgetCard() {
               Start tracking your expenses by setting up budgets
             </p>
           </div>
-        </Link>
+        </div>
       </motion.div>
     );
   }
@@ -185,7 +184,7 @@ function BudgetCard() {
     >
       {/* Overview Section */}
       <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-900 p-4 rounded-lg h-full">
-      <Link to="/budget">
+      <div >
         <div className="mb-3">
           <h2 className="text-lg font-semibold">Budget Overview</h2>
         </div>
@@ -237,7 +236,7 @@ function BudgetCard() {
         <div className="text-xs text-slate-400 mt-3">
           Based on {budgetTransactions.length} transactions across {budgets.length} budget categories
         </div>
-        </Link>
+        </div>
       </div>
     </motion.div>
   );
